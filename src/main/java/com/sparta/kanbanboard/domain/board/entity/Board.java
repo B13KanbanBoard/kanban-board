@@ -1,22 +1,19 @@
 package com.sparta.kanbanboard.domain.board.entity;
 
+import com.sparta.kanbanboard.common.base.entity.Timestamped;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class Board {
+public class Board extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
@@ -27,14 +24,8 @@ public class Board {
 
     private String content;
 
-    @CreatedDate
-    @Column(updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime created_at;
+    private Timestamp created_at;
 
-    @LastModifiedDate
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime updated_at;
+    private Timestamp updated_at;
 
 }
