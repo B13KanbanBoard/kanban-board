@@ -1,7 +1,9 @@
 package com.sparta.kanbanboard.domain.member.entity;
 
+import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.ALREADY_LOGOUT;
+
 import com.sparta.kanbanboard.common.base.entity.Timestamped;
-import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
+import com.sparta.kanbanboard.common.exception.customexception.MemberAlreadyLogoutException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 @Getter
 @Entity
@@ -60,6 +63,16 @@ public class Member extends Timestamped {
                 .name(name)
                 .role(role)
                 .build();
+    }
+
+    /**
+     * refresh 토근 삭제
+     */
+    public void deleteToken() {
+        if(!StringUtils.hasText(this.refreshToken)){
+            throw new MemberAlreadyLogoutException(ALREADY_LOGOUT);
+        }
+        this.refreshToken = "";
     }
 
 }
