@@ -12,7 +12,7 @@ public enum MemberRole {
 
     private final String MemberRole;
 
-    public String getRole() {
+    public String getAuthority() {
         return switch(this) {
             case USER -> "USER";
             case ADMIN -> "ADMIN";

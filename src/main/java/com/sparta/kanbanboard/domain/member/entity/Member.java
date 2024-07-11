@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -37,6 +38,10 @@ public class Member extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
 
+    @Setter
+    @Column
+    private String refreshToken;
+
     @Builder
     public Member(String email, String password, String name, MemberRole role) {
         this.email = email;
@@ -45,6 +50,9 @@ public class Member extends Timestamped {
         this.role = role;
     }
 
+    /**
+     * Member 생성
+     */
     public static Member createMember(final SignupRequest request, String password, MemberRole role) {
         return Member.builder()
                 .email(request.getEmail())

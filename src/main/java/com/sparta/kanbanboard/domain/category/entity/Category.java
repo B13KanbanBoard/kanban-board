@@ -16,7 +16,7 @@ public class Category extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    private Long order;
+    private Long orderNumber;
 
 //    @ManyToOne
 //    @JoinColumn(name = "member_id", nullable = false)
