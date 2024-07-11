@@ -41,7 +41,6 @@ public class Member extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
 
-    @Setter
     @Column
     private String refreshToken;
 
@@ -66,6 +65,13 @@ public class Member extends Timestamped {
     }
 
     /**
+     * refresh 토큰 저장
+     */
+    public void saveRefreshToken(String token) {
+        this.refreshToken = token;
+    }
+
+    /**
      * refresh 토근 삭제
      */
     public void deleteToken() {
@@ -82,4 +88,10 @@ public class Member extends Timestamped {
         this.password = password;
     }
 
+    /**
+     * 프로필 수정
+     */
+    public void updateProfile(String name) {
+        this.name = name;
+    }
 }

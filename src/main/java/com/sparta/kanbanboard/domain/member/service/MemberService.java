@@ -1,13 +1,16 @@
 package com.sparta.kanbanboard.domain.member.service;
 
 import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.DUPLICATED_USER;
+import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.MISMATCH_USER;
 import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.NOT_FOUND_USER;
 import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.PASSWORD_NOT_MATCH;
 import static com.sparta.kanbanboard.common.security.errorcode.SecurityErrorCode.INVALID_JWT_SIGNATURE;
 import static com.sparta.kanbanboard.common.security.jwt.JwtConstants.ACCESS_TOKEN_HEADER;
+import static com.sparta.kanbanboard.common.security.jwt.JwtConstants.BEARER_PREFIX;
 import static com.sparta.kanbanboard.common.security.jwt.JwtConstants.REFRESH_TOKEN_HEADER;
 
 import com.sparta.kanbanboard.common.exception.customexception.MemberDuplicationException;
+import com.sparta.kanbanboard.common.exception.customexception.MemberMismatchException;
 import com.sparta.kanbanboard.common.exception.customexception.MemberNotFoundException;
 import com.sparta.kanbanboard.common.exception.customexception.MemberPasswordNotMatchesException;
 import com.sparta.kanbanboard.common.exception.customexception.ReissueTokenFailException;
@@ -16,6 +19,7 @@ import com.sparta.kanbanboard.domain.member.dto.ProfileResponse;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
 import com.sparta.kanbanboard.domain.member.dto.SignupResponse;
 import com.sparta.kanbanboard.domain.member.dto.UpdatePasswordRequest;
+import com.sparta.kanbanboard.domain.member.dto.UpdateProfileRequest;
 import com.sparta.kanbanboard.domain.member.entity.Member;
 import com.sparta.kanbanboard.domain.member.entity.MemberRole;
 import com.sparta.kanbanboard.domain.member.repository.MemberRepository;
@@ -74,12 +78,14 @@ public class MemberService {
     /**
      * 토큰 재발급
      */
+    @Transactional
     public String reissueToken(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = jwtProvider.getJwtFromHeader(request, REFRESH_TOKEN_HEADER);
 
         if(!StringUtils.hasText(refreshToken) || !jwtProvider.validateTokenInternal(refreshToken)){
             throw new ReissueTokenFailException(INVALID_JWT_SIGNATURE);
         }
+
         String email = jwtProvider.getEmailFromClaims(refreshToken).getSubject();
         Member findMember = memberRepository.findByEmail(email).orElseThrow(
                 () -> new MemberNotFoundException(NOT_FOUND_USER)
@@ -87,9 +93,9 @@ public class MemberService {
 
         String newAccessToken = jwtProvider.createAccessToken(email, findMember.getRole());
         String newRefreshToken = jwtProvider.createRefreshToken(email, findMember.getRole());
-
-        findMember.setRefreshToken(newRefreshToken);
-
+        log.info("1" + findMember.getRefreshToken());
+        findMember.saveRefreshToken(newRefreshToken.substring(BEARER_PREFIX.length()));
+        log.info("2" + findMember.getRefreshToken());
         response.setHeader(ACCESS_TOKEN_HEADER, newAccessToken);
         response.setHeader(REFRESH_TOKEN_HEADER, newRefreshToken);
 
@@ -99,7 +105,19 @@ public class MemberService {
     /**
      * 프로필 조회
      */
+    @Transactional(readOnly = true)
     public ProfileResponse getProfile(Member member) {
+        return ProfileResponse.of(member);
+    }
+
+    /**
+     * 프로필 수정
+     */
+    @Transactional
+    public ProfileResponse updateProfile(UpdateProfileRequest request, Member member) {
+        member.updateProfile(request.getName());
+        memberRepository.save(member);
+
         return ProfileResponse.of(member);
     }
 
@@ -108,7 +126,7 @@ public class MemberService {
      */
     @Transactional
     public String updatePwd(UpdatePasswordRequest request, Member member) {
-        if(!passwordEncoder.matches(member.getPassword(), request.getOldPassword())){
+        if(!passwordEncoder.matches(request.getOldPassword(), member.getPassword())){
             throw new MemberPasswordNotMatchesException(PASSWORD_NOT_MATCH);
         }
         String newPassword = passwordEncoder.encode(request.getNewPassword());
@@ -116,6 +134,21 @@ public class MemberService {
         member.updatePwd(newPassword);
         memberRepository.save(member);
 
+        return member.getEmail();
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    public String deleteMember(Long memberId, Member member) {
+        if(!memberId.equals(member.getId())) {
+            throw new MemberMismatchException(MISMATCH_USER);
+        }
+        memberRepository.delete(member);
+        //해당 Board 삭제
+        //해당 Category 삭제
+        //해당 Card 삭제
+        //해당 Comment 삭제
         return member.getEmail();
     }
 }
