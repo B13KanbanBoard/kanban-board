@@ -73,4 +73,17 @@ public class CategoryController {
         CategoryResponse response = categoryService.updateCategory(boardId, categoryId, req, userDetails.getMember());
         return getResponseEntity("카테고리 수정 완료", response);
     }
+
+    /**
+     * 카테고리 삭제
+     */
+    @DeleteMapping("/{boardId}/categories/{categoryId}")
+    public ResponseEntity<CommonResponse<Long>> deleteCategory(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        categoryService.deleteCategory(boardId, categoryId, userDetails.getMember());
+        return getResponseEntity("카테고리 삭제 완료", categoryId);
+    }
 }

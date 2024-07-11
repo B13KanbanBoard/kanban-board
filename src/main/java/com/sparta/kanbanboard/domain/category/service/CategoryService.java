@@ -79,6 +79,7 @@ public class CategoryService {
     @Transactional
     public CategoryResponse updateCategory(Long boardId, Long categoryId, CategoryUpdateRequest request, Member member) {
         checkUserAuthToCategory(member, categoryId);
+        checkBoardAndCategoryRelation(boardId, categoryId);
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
 
         String newName = request.getName();
@@ -94,6 +95,18 @@ public class CategoryService {
         }
 
         return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
+    }
+
+    /**
+     * 카테고리 삭제
+     */
+    @Transactional
+    public void deleteCategory(Long boardId, Long categoryId, Member member) {
+        checkUserAuthToCategory(member, categoryId);
+        checkBoardAndCategoryRelation(boardId, categoryId);
+
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
+        categoryRepository.delete(tempCategory);
     }
 
     /**
