@@ -7,6 +7,8 @@ import com.sparta.kanbanboard.common.security.UserDetailsImpl;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
 import com.sparta.kanbanboard.domain.member.dto.SignupResponse;
 import com.sparta.kanbanboard.domain.member.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,17 @@ public class MemberController {
     ) {
         Long response = memberService.logout(userDetails.getMember());
         return getResponseEntity("로그아웃 성공", response);
+    }
+
+    /**
+     * 토큰 재발급
+     */
+    @PostMapping("/refresh-token")
+    public ResponseEntity<CommonResponse<String>> reissueToken(
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        String refreshToken = memberService.reissueToken(request, response);
+        return getResponseEntity("토큰 재발급 성공", refreshToken);
     }
 
 }

@@ -1,15 +1,22 @@
 package com.sparta.kanbanboard.domain.member.service;
 
-import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.ALREADY_LOGOUT;
 import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.DUPLICATED_USER;
+import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.NOT_FOUND_USER;
+import static com.sparta.kanbanboard.common.security.errorcode.SecurityErrorCode.INVALID_JWT_SIGNATURE;
+import static com.sparta.kanbanboard.common.security.jwt.JwtConstants.ACCESS_TOKEN_HEADER;
+import static com.sparta.kanbanboard.common.security.jwt.JwtConstants.REFRESH_TOKEN_HEADER;
 
-import com.sparta.kanbanboard.common.exception.customexception.MemberAlreadyLogoutException;
 import com.sparta.kanbanboard.common.exception.customexception.MemberDuplicationException;
+import com.sparta.kanbanboard.common.exception.customexception.MemberNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.ReissueTokenFailException;
+import com.sparta.kanbanboard.common.security.jwt.JwtProvider;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
 import com.sparta.kanbanboard.domain.member.dto.SignupResponse;
 import com.sparta.kanbanboard.domain.member.entity.Member;
 import com.sparta.kanbanboard.domain.member.entity.MemberRole;
 import com.sparta.kanbanboard.domain.member.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +29,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -59,4 +67,28 @@ public class MemberService {
         return member.getId();
     }
 
+    /**
+     * 토큰 재발급
+     */
+    public String reissueToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = jwtProvider.getJwtFromHeader(request, REFRESH_TOKEN_HEADER);
+
+        if(!StringUtils.hasText(refreshToken) || !jwtProvider.validateTokenInternal(refreshToken)){
+            throw new ReissueTokenFailException(INVALID_JWT_SIGNATURE);
+        }
+        String email = jwtProvider.getEmailFromClaims(refreshToken).getSubject();
+        Member findMember = memberRepository.findByEmail(email).orElseThrow(
+                () -> new MemberNotFoundException(NOT_FOUND_USER)
+        );
+
+        String newAccessToken = jwtProvider.createAccessToken(email, findMember.getRole());
+        String newRefreshToken = jwtProvider.createRefreshToken(email, findMember.getRole());
+
+        findMember.setRefreshToken(newRefreshToken);
+
+        response.setHeader(ACCESS_TOKEN_HEADER, newAccessToken);
+        response.setHeader(REFRESH_TOKEN_HEADER, newRefreshToken);
+
+        return newRefreshToken;
+    }
 }

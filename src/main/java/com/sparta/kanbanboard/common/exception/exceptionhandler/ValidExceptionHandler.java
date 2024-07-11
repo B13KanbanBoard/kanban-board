@@ -17,7 +17,7 @@ public class ValidExceptionHandler {
      * 유효성 검사 에러 체크
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected <T> ResponseEntity<ErrorResponse<T>> validException(MethodArgumentNotValidException e) {
+    protected <T> ResponseEntity<ErrorResponse> validException(MethodArgumentNotValidException e) {
         log.error("MethodArgumentNotValidException : " + e.getMessage());
 
         return getFieldErrorResponseEntity(e.getBindingResult(), e.getMessage());
