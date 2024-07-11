@@ -33,6 +33,12 @@ public class CategoryService {
     @Transactional
     public CategoryCreateResponse createCategory(Long boardId, String name, Member member) {
         // 멤버가 매니저 역할인지 확인하는 메서드 추가하기
+//        Board tempBoard = boardRepository.findById(boardId).orElseThrow(NullPointerException::new);
+//        // 예외처리 수정
+//        if( (!Objects.equals(tempBoard.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
+//            throw new IllegalArgumentException("해당 멤버는 카테고리에 작업 권한이 없습니다");
+//        }
+
         Board tempBoard = boardRepository.findById(boardId).orElseThrow(NullPointerException::new);
         // 예외처리 nullpointer -> boardnotfound으로 변경시켜주기
         Long orderNum = (long) (tempBoard.getCategoryList().size() + 1);
@@ -112,7 +118,7 @@ public class CategoryService {
     /**
      * 카테고리가 해당보드에 연관된것이 맞는지 확인
      */
-    protected void checkBoardAndCategoryRelation(Long boardId, Long categoryId) {
+    public void checkBoardAndCategoryRelation(Long boardId, Long categoryId) {
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
         if(!Objects.equals(tempCategory.getBoard().getId(), boardId)){
             throw new IllegalArgumentException("Category does not belong to the board");
@@ -122,7 +128,7 @@ public class CategoryService {
     /**
      * 카테고리가 해당 유저가 만든것인지 확인
      */
-    protected void checkUserAuthToCategory(Member member, Long categoryId) {
+    public void checkUserAuthToCategory(Member member, Long categoryId) {
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
         if( (!Objects.equals(tempCategory.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
             throw new IllegalArgumentException("해당 멤버는 카테고리에 작업 권한이 없습니다");
