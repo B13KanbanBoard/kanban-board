@@ -42,8 +42,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String accessToken = jwtProvider.getJwtFromHeader(req, ACCESS_TOKEN_HEADER);
 
         log.info("access token 검증");
-        if (StringUtils.hasText(accessToken) && !jwtProvider.validateTokenInternal(accessToken)) {
-            log.error("Access Token 검증");
+        if (StringUtils.hasText(accessToken) && jwtProvider.validateTokenInternal(accessToken)) {
+            log.error("Access Token 검증 완료");
 
             String email = jwtProvider.getEmailFromClaims(accessToken).getSubject();
             Member findMember = memberRepository.findByEmail(email).orElseThrow(

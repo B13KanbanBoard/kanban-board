@@ -75,7 +75,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtProvider.createRefreshToken(email, role);
 
         // refresh 토큰 저장
-        member.setRefreshToken(refreshToken.substring(BEARER_PREFIX.length()));
+        member.saveRefreshToken(refreshToken.substring(BEARER_PREFIX.length()));
         memberRepository.save(member);
 
         // 응답 헤더에 토큰 추가

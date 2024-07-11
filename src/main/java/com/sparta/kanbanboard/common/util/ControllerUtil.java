@@ -18,14 +18,14 @@ public final class ControllerUtil {
     private ControllerUtil() {
     }
 
-    public static <T> ResponseEntity<ErrorResponse<T>> getFieldErrorResponseEntity(BindingResult bindingResult, String message) {
+    public static <T> ResponseEntity<ErrorResponse> getFieldErrorResponseEntity(BindingResult bindingResult, String message) {
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         for (FieldError fieldError : fieldErrors) {
             log.error("{} field : {}", fieldError.getField(), fieldError.getDefaultMessage());
         }
 
         return ResponseEntity.status(StatusCode.BAD_REQUEST.code)
-                .body((ErrorResponse<T>) ErrorResponse.of(INVALID_ARGUMENT_ERROR, fieldErrors));
+                .body(ErrorResponse.of(INVALID_ARGUMENT_ERROR, fieldErrors));
     }
 
     public static <T> ResponseEntity<ErrorResponse> getBadRequestResponseEntity(ErrorCode errorCode) {
