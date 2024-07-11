@@ -5,12 +5,11 @@ import com.sparta.kanbanboard.common.base.dto.CommonResponse;
 import com.sparta.kanbanboard.common.security.UserDetailsImpl;
 import com.sparta.kanbanboard.domain.category.dto.CategoryCreateRequest;
 import com.sparta.kanbanboard.domain.category.dto.CategoryCreateResponse;
-import com.sparta.kanbanboard.domain.category.dto.CategoryGetResponse;
+import com.sparta.kanbanboard.domain.category.dto.CategoryResponse;
+import com.sparta.kanbanboard.domain.category.dto.CategoryUpdateRequest;
 import com.sparta.kanbanboard.domain.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
@@ -42,10 +41,10 @@ public class CategoryController {
      * 카테고리 전체 조회
      */
     @GetMapping("/{boardId}/categories")
-    public ResponseEntity<CommonResponse<List<CategoryGetResponse>>> getAllCategories(
+    public ResponseEntity<CommonResponse<List<CategoryResponse>>> getAllCategories(
             @PathVariable Long boardId
     ){
-        List<CategoryGetResponse> response = categoryService.getAllCategories(boardId);
+        List<CategoryResponse> response = categoryService.getAllCategories(boardId);
         return getResponseEntity("모든 카테고리 조회 완료", response);
     }
 
@@ -53,11 +52,25 @@ public class CategoryController {
      * 특정카테고리 조회
      */
     @GetMapping("/{boardId}/categories/{categoryId}")
-    public ResponseEntity<CommonResponse<CategoryGetResponse>> getCategory(
+    public ResponseEntity<CommonResponse<CategoryResponse>> getCategory(
             @PathVariable Long boardId,
             @PathVariable Long categoryId
     ){
-        CategoryGetResponse response = categoryService.getCategory(boardId, categoryId);
+        CategoryResponse response = categoryService.getCategory(boardId, categoryId);
         return getResponseEntity("해당 카테고리 조회 완료", response);
+    }
+
+    /**
+     * 카테고리 수정
+     */
+    @PatchMapping("/{boardId}/categories/{categoryId}")
+    public ResponseEntity<CommonResponse<CategoryResponse>> updateCategory(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId,
+            @RequestBody CategoryUpdateRequest req,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        CategoryResponse response = categoryService.updateCategory(boardId, categoryId, req, userDetails.getMember());
+        return getResponseEntity("카테고리 수정 완료", response);
     }
 }

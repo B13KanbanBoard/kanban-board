@@ -23,6 +23,6 @@ public class Board extends Timestamped {
 
     private String content;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categoryList = new ArrayList<>();
 }

@@ -1,12 +1,11 @@
 package com.sparta.kanbanboard.domain.category.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
-public class CategoryGetResponse {
-    private Long id;
+@RequiredArgsConstructor
+public class CategoryUpdateRequest {
     private String name;
     private Long orderNumber;
 }

@@ -45,4 +45,12 @@ public class Category extends Timestamped {
         board.getCategoryList().add(this);
     }
 
+    public void updateName(String name){
+        this.name = name;
+    }
+
+    public void updateOrderNumber(Long orderNumber){
+        this.orderNumber = orderNumber;
+    }
+
 }

@@ -4,10 +4,12 @@ package com.sparta.kanbanboard.domain.category.service;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
 import com.sparta.kanbanboard.domain.category.dto.CategoryCreateResponse;
-import com.sparta.kanbanboard.domain.category.dto.CategoryGetResponse;
+import com.sparta.kanbanboard.domain.category.dto.CategoryResponse;
+import com.sparta.kanbanboard.domain.category.dto.CategoryUpdateRequest;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.category.repository.CategoryRepository;
 import com.sparta.kanbanboard.domain.member.entity.Member;
+import com.sparta.kanbanboard.domain.member.entity.MemberRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,13 +50,13 @@ public class CategoryService {
      * 전체 카테고리 조회
      */
     @Transactional(readOnly = true)
-    public List<CategoryGetResponse> getAllCategories(Long boardId){
+    public List<CategoryResponse> getAllCategories(Long boardId){
         Board tempBoard = boardRepository.findById(boardId).orElseThrow(NullPointerException::new);
         // 예외처리 nullpointer -> boardnotfound으로 변경시켜주기
         List<Category> categories = tempBoard.getCategoryList();
-        List<CategoryGetResponse> result = new ArrayList<>();
+        List<CategoryResponse> result = new ArrayList<>();
         for (Category category : categories) {
-            CategoryGetResponse res = new CategoryGetResponse(category.getId(), category.getName(), category.getOrderNumber());
+            CategoryResponse res = new CategoryResponse(category.getId(), category.getName(), category.getOrderNumber());
             result.add(res);
         }
         return result;
@@ -64,13 +66,35 @@ public class CategoryService {
      * 특정 카테고리 조회
      */
     @Transactional(readOnly = true)
-    public CategoryGetResponse getCategory(Long boardId, Long categoryId){
+    public CategoryResponse getCategory(Long boardId, Long categoryId){
         checkBoardAndCategoryRelation(boardId, categoryId);
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
         // 예외처리 만들기
-        return new CategoryGetResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
+        return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
     }
 
+    /**
+     * 카테고리 수정
+     */
+    @Transactional
+    public CategoryResponse updateCategory(Long boardId, Long categoryId, CategoryUpdateRequest request, Member member) {
+        checkUserAuthToCategory(member, categoryId);
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
+
+        String newName = request.getName();
+        Long newOrderNumber = request.getOrderNumber();
+
+        if(newName != null){
+            tempCategory.updateName(newName);
+        }
+        if(newOrderNumber != null){
+            // newOrder가 이미 존재하는 순서인지 확인하는 로직 필요
+            // 순서 바꾸는거에 대한 로직 생각이 더 필요
+            tempCategory.updateOrderNumber(newOrderNumber);
+        }
+
+        return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
+    }
 
     /**
      * 카테고리가 해당보드에 연관된것이 맞는지 확인
@@ -82,5 +106,13 @@ public class CategoryService {
         }
     }
 
-
+    /**
+     * 카테고리가 해당 유저가 만든것인지 확인
+     */
+    protected void checkUserAuthToCategory(Member member, Long categoryId) {
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
+        if( (!Objects.equals(tempCategory.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
+            throw new IllegalArgumentException("해당 멤버는 카테고리에 작업 권한이 없습니다");
+        }
+    }
 }
