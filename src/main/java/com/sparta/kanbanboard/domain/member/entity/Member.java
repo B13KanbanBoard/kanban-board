@@ -75,4 +75,11 @@ public class Member extends Timestamped {
         this.refreshToken = "";
     }
 
+    /**
+     * 비밀번호 변경
+     */
+    public void updatePwd(String password) {
+        this.password = password;
+    }
+
 }

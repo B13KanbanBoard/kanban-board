@@ -2,17 +2,20 @@ package com.sparta.kanbanboard.domain.member.service;
 
 import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.DUPLICATED_USER;
 import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.NOT_FOUND_USER;
+import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.PASSWORD_NOT_MATCH;
 import static com.sparta.kanbanboard.common.security.errorcode.SecurityErrorCode.INVALID_JWT_SIGNATURE;
 import static com.sparta.kanbanboard.common.security.jwt.JwtConstants.ACCESS_TOKEN_HEADER;
 import static com.sparta.kanbanboard.common.security.jwt.JwtConstants.REFRESH_TOKEN_HEADER;
 
 import com.sparta.kanbanboard.common.exception.customexception.MemberDuplicationException;
 import com.sparta.kanbanboard.common.exception.customexception.MemberNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.MemberPasswordNotMatchesException;
 import com.sparta.kanbanboard.common.exception.customexception.ReissueTokenFailException;
 import com.sparta.kanbanboard.common.security.jwt.JwtProvider;
 import com.sparta.kanbanboard.domain.member.dto.ProfileResponse;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
 import com.sparta.kanbanboard.domain.member.dto.SignupResponse;
+import com.sparta.kanbanboard.domain.member.dto.UpdatePasswordRequest;
 import com.sparta.kanbanboard.domain.member.entity.Member;
 import com.sparta.kanbanboard.domain.member.entity.MemberRole;
 import com.sparta.kanbanboard.domain.member.repository.MemberRepository;
@@ -96,8 +99,23 @@ public class MemberService {
     /**
      * 프로필 조회
      */
-    @Transactional
     public ProfileResponse getProfile(Member member) {
         return ProfileResponse.of(member);
+    }
+
+    /**
+     * 비밀번호 변경
+     */
+    @Transactional
+    public String updatePwd(UpdatePasswordRequest request, Member member) {
+        if(!passwordEncoder.matches(member.getPassword(), request.getOldPassword())){
+            throw new MemberPasswordNotMatchesException(PASSWORD_NOT_MATCH);
+        }
+        String newPassword = passwordEncoder.encode(request.getNewPassword());
+
+        member.updatePwd(newPassword);
+        memberRepository.save(member);
+
+        return member.getEmail();
     }
 }

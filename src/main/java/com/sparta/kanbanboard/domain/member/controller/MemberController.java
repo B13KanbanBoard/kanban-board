@@ -7,6 +7,7 @@ import com.sparta.kanbanboard.common.security.UserDetailsImpl;
 import com.sparta.kanbanboard.domain.member.dto.ProfileResponse;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
 import com.sparta.kanbanboard.domain.member.dto.SignupResponse;
+import com.sparta.kanbanboard.domain.member.dto.UpdatePasswordRequest;
 import com.sparta.kanbanboard.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -72,6 +73,18 @@ public class MemberController {
     ){
         ProfileResponse response = memberService.getProfile(userDetails.getMember());
         return getResponseEntity("프로필 조회 성공", response);
+    }
+
+    /**
+     * 비밀번호 수정
+     */
+    @PatchMapping("/update-pwd")
+    public ResponseEntity<CommonResponse<String>> updatePwd(
+            @Valid @RequestBody UpdatePasswordRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        String response = memberService.updatePwd(request, userDetails.getMember());
+        return getResponseEntity("비밀번호 변경 성공", response);
     }
 
 }
