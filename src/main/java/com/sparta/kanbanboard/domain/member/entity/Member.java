@@ -31,9 +31,6 @@ public class Member extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Category> categoryList = new ArrayList<>();
-
     @Setter
     @Column
     private String refreshToken;
