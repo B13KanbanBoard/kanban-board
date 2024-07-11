@@ -53,11 +53,11 @@ public class Member extends Timestamped {
     /**
      * Member 생성
      */
-    public static Member createMember(final SignupRequest request, String password, MemberRole role) {
+    public static Member createMember(String email, String password, String name, MemberRole role) {
         return Member.builder()
-                .email(request.getEmail())
+                .email(email)
                 .password(password)
-                .name(request.getName())
+                .name(name)
                 .role(role)
                 .build();
     }
