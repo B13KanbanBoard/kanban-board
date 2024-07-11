@@ -10,6 +10,7 @@ import com.sparta.kanbanboard.common.exception.customexception.MemberDuplication
 import com.sparta.kanbanboard.common.exception.customexception.MemberNotFoundException;
 import com.sparta.kanbanboard.common.exception.customexception.ReissueTokenFailException;
 import com.sparta.kanbanboard.common.security.jwt.JwtProvider;
+import com.sparta.kanbanboard.domain.member.dto.ProfileResponse;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
 import com.sparta.kanbanboard.domain.member.dto.SignupResponse;
 import com.sparta.kanbanboard.domain.member.entity.Member;
@@ -90,5 +91,13 @@ public class MemberService {
         response.setHeader(REFRESH_TOKEN_HEADER, newRefreshToken);
 
         return newRefreshToken;
+    }
+
+    /**
+     * 프로필 조회
+     */
+    @Transactional
+    public ProfileResponse getProfile(Member member) {
+        return ProfileResponse.of(member);
     }
 }
