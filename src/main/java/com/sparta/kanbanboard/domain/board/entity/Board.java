@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,8 +23,8 @@ public class Board extends Timestamped {
 
     private String content;
 
-    private Timestamp created_at;
+    //private Timestamp created_at;
 
-    private Timestamp updated_at;
+    //private Timestamp updated_at;
 
 }
