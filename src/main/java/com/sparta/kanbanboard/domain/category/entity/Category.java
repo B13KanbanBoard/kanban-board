@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -37,7 +38,6 @@ public class Category extends Timestamped {
 
     public void setMember(Member member){
         this.member = member;
-        member.getCategoryList().add(this);
     }
 
     public void setBoard(Board board){

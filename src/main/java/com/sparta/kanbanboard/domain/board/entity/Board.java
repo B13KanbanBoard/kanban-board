@@ -25,7 +25,4 @@ public class Board extends Timestamped {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<Category> categoryList = new ArrayList<>();
-
-
-
 }

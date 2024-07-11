@@ -5,6 +5,7 @@ import com.sparta.kanbanboard.common.base.dto.CommonResponse;
 import com.sparta.kanbanboard.common.security.UserDetailsImpl;
 import com.sparta.kanbanboard.domain.category.dto.CategoryCreateRequest;
 import com.sparta.kanbanboard.domain.category.dto.CategoryCreateResponse;
+import com.sparta.kanbanboard.domain.category.dto.CategoryGetResponse;
 import com.sparta.kanbanboard.domain.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,29 @@ public class CategoryController {
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
         CategoryCreateResponse response = categoryService.createCategory(boardId, req.getName(), userDetails.getMember());
+        return getResponseEntity("카테고리 생성 완료", response);
+    }
 
-        return getResponseEntity("success", response);
+    /**
+     * 카테고리 전체 조회
+     */
+    @GetMapping("/{boardId}/categories")
+    public ResponseEntity<CommonResponse<List<CategoryGetResponse>>> getAllCategories(
+            @PathVariable Long boardId
+    ){
+        List<CategoryGetResponse> response = categoryService.getAllCategories(boardId);
+        return getResponseEntity("모든 카테고리 조회 완료", response);
+    }
+
+    /**
+     * 특정카테고리 조회
+     */
+    @GetMapping("/{boardId}/categories/{categoryId}")
+    public ResponseEntity<CommonResponse<CategoryGetResponse>> getCategory(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId
+    ){
+        CategoryGetResponse response = categoryService.getCategory(boardId, categoryId);
+        return getResponseEntity("해당 카테고리 조회 완료", response);
     }
 }
