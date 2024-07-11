@@ -1,6 +1,8 @@
 package com.sparta.kanbanboard.domain.category.entity;
 
 import com.sparta.kanbanboard.common.base.entity.Timestamped;
+import com.sparta.kanbanboard.domain.board.entity.Board;
+import com.sparta.kanbanboard.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,12 +20,29 @@ public class Category extends Timestamped {
 
     private Long orderNumber;
 
-//    @ManyToOne
-//    @JoinColumn(name = "member_id", nullable = false)
-//    private Member member;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "board_id", nullable = false)
-//    private Board board;
+    private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    @ManyToOne
+    @JoinColumn(name = "board_id", nullable = false)
+    private Board board;
+
+    public Category(String name, Long orderNumber){
+        this.name = name;
+        this.orderNumber = orderNumber;
+    }
+
+    public void setMember(Member member){
+        this.member = member;
+        member.getCategoryList().add(this);
+    }
+
+    public void setBoard(Board board){
+        this.board = board;
+        board.getCategoryList().add(this);
+    }
 
 }

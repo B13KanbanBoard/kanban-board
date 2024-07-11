@@ -1,20 +1,13 @@
 package com.sparta.kanbanboard.domain.member.entity;
 
 import com.sparta.kanbanboard.common.base.entity.Timestamped;
+import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -37,6 +30,9 @@ public class Member extends Timestamped {
 
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Category> categoryList = new ArrayList<>();
 
     @Setter
     @Column

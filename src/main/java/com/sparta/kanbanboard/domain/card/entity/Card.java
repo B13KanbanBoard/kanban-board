@@ -22,6 +22,8 @@ public class Card extends Timestamped {
 
     private String description;
 
+    private Long orderNumber;
+
 //    @ManyToOne
 //    @JoinColumn(name = "category_id", nullable = false)
 //    private Category category;
