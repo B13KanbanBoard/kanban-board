@@ -94,6 +94,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 실패 : {}", failed.getMessage());
 
         writeJsonResponse(response, HttpStatus.BAD_REQUEST, "로그인에 실패했습니다.", "");
+        response.setStatus(401); // 로그인 실패 Status 전송
     }
 
     /**
