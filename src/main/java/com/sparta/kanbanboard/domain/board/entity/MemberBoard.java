@@ -26,13 +26,19 @@ public class MemberBoard {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member_id;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
-    private Board board_id;
+    private Board board;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BoardRole role;
+
+    public MemberBoard(Board board, Member member, BoardRole boardRole) {
+        this.board = board;
+        this.member = member;
+        this.role = boardRole;
+    }
 }
