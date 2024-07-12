@@ -1,13 +1,13 @@
 package com.sparta.kanbanboard.domain.board.entity;
 
 import com.sparta.kanbanboard.common.base.entity.Timestamped;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.sparta.kanbanboard.domain.category.entity.Category;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,8 +23,6 @@ public class Board extends Timestamped {
 
     private String content;
 
-    //private Timestamp created_at;
-
-    //private Timestamp updated_at;
-
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Category> categoryList = new ArrayList<>();
 }
