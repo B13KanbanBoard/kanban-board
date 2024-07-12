@@ -73,5 +73,20 @@ public class Card extends Timestamped {
         this.endDate = endDate;
     }
 
+    public void updateTitle(String title){
+        this.title = title;
+    }
+
+    public void updateDescription(String description){
+        this.description = description;
+    }
+
+    public void updateAssignee(String assignee){
+        this.assignee = assignee;
+    }
+
+    public void updateOrderNumber(Long orderNumber){
+        this.orderNumber = orderNumber;
+    }
 
 }

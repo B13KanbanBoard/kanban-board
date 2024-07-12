@@ -3,6 +3,8 @@ package com.sparta.kanbanboard.domain.card.service;
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.card.repository.CardRepository;
+import com.sparta.kanbanboard.domain.category.dto.CardUpdateRequest;
+import com.sparta.kanbanboard.domain.category.dto.CardUpdateResponse;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.category.repository.CategoryRepository;
 import com.sparta.kanbanboard.domain.category.service.CategoryService;
@@ -100,6 +102,39 @@ public class CardService {
         return new CardUpdateDateResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getStartDate(), tempCard.getEndDate());
     }
 
+    /**
+     * 카드 수정
+     */
+    @Transactional
+    public CardUpdateResponse updateCard(Long boardId, Long categoryId, Long cardId, CardUpdateRequest req, Member member) {
+        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+        Card tempCard = cardRepository.findById(cardId).orElseThrow(NullPointerException::new);
+        // 예외처리 수정
+        checkCategoryAndCardRelation(categoryId, tempCard);
+        checkMemberAuthToCard(member, tempCard);
+
+        String title = req.getTitle();
+        String assignee = req.getAssignee();
+        String description = req.getDescription();
+        Long orderNum = req.getOrderNumber();
+
+        if(title != null){
+            tempCard.updateTitle(title);
+        }
+        if(assignee != null){
+            tempCard.updateAssignee(assignee);
+        }
+        if(description != null){
+            tempCard.updateDescription(description);
+        }
+        if(orderNum != null){
+            tempCard.updateOrderNumber(orderNum);
+        }
+
+        return new CardUpdateResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getAssignee(),
+                tempCard.getDescription(), tempCard.getOrderNumber());
+    }
+
 
     /**
      * 카테고리, 카드 연관 확인
@@ -119,6 +154,4 @@ public class CardService {
             throw new IllegalArgumentException("해당 멤버는 카드에 작업 권한이 없습니다");
         }
     }
-
-
 }

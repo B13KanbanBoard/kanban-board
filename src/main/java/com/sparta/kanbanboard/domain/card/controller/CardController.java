@@ -4,6 +4,8 @@ import com.sparta.kanbanboard.common.base.dto.CommonResponse;
 import com.sparta.kanbanboard.common.security.UserDetailsImpl;
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.service.CardService;
+import com.sparta.kanbanboard.domain.category.dto.CardUpdateRequest;
+import com.sparta.kanbanboard.domain.category.dto.CardUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -62,8 +64,6 @@ public class CardController {
 
     /**
      * 시작일자, 마감일자 설정 :
-     * private LocalDate startDate;
-     * private LocalDate endDate;
      */
     @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}/update-date")
     public ResponseEntity<CommonResponse<CardUpdateDateResponse>> updateDateCard(
@@ -80,4 +80,15 @@ public class CardController {
     /**
      * 카드 수정
      */
+    @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}")
+    public ResponseEntity<CommonResponse<CardUpdateResponse>> updateCard(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId,
+            @PathVariable Long cardId,
+            @RequestBody CardUpdateRequest req,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        CardUpdateResponse response = cardService.updateCard(boardId, categoryId, cardId, req, userDetails.getMember());
+        return getResponseEntity("카드 수정 완료", response);
+    }
 }
