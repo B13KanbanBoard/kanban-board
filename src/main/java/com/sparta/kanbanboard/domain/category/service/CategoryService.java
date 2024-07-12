@@ -44,9 +44,7 @@ public class CategoryService {
                 () -> new BoardNotFoundException(BOARD_NOT_FOUND));
         Long orderNum = (long) (tempBoard.getCategoryList().size() + 1);
 
-        Category category = new Category(name, orderNum);
-        category.setMember(member);
-        category.setBoard(tempBoard);
+        Category category = new Category(name, orderNum, member, tempBoard);
 
         categoryRepository.save(category);
 

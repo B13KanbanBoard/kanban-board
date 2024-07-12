@@ -46,9 +46,7 @@ public class CardService {
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         Long orderNum = (long) (tempCategory.getCardList().size() + 1);
 
-        Card card = new Card(req.getTitle(), req.getAssignee(), req.getDescription(), orderNum);
-        card.setCategory(tempCategory);
-        card.setMember(member);
+        Card card = new Card(req.getTitle(), req.getAssignee(), req.getDescription(), orderNum, tempCategory, member);
 
         cardRepository.save(card);
 
