@@ -7,12 +7,12 @@ import java.time.LocalDate;
 
 @Getter
 public class CardResponse {
-    private Long cardId;
-    private String title;
-    private String assignee;
-    private String description;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private final Long cardId;
+    private final String title;
+    private final String assignee;
+    private final String description;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
 
     @Builder
     public CardResponse(Long cardId, String title, String assignee, String description, LocalDate startDate, LocalDate endDate) {

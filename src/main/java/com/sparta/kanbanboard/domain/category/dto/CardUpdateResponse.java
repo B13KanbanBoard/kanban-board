@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CardUpdateResponse {
-    private Long id;
-    private String title;
-    private String assignee;
-    private String description;
-    private Long orderNumber;
+    private final Long id;
+    private final String title;
+    private final String assignee;
+    private final String description;
+    private final Long orderNumber;
 }

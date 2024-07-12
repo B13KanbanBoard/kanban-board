@@ -8,8 +8,8 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 public class CardUpdateDateResponse {
-    private Long id;
-    private String title;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private final Long id;
+    private final String title;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
 }

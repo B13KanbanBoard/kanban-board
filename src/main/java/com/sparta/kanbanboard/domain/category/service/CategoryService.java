@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -68,18 +67,6 @@ public class CategoryService {
                                 .orderNumber(m.getOrderNumber())
                                 .build()
                 ).collect(Collectors.toList());
-    }
-
-    /**
-     * 특정 카테고리 조회
-     */
-    @Transactional(readOnly = true)
-    public CategoryResponse getCategory(Long boardId, Long categoryId){
-        checkBoardAndCategoryRelation(boardId, categoryId);
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
-
-        return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
     }
 
     /**

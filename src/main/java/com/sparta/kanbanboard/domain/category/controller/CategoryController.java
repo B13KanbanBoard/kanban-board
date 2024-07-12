@@ -49,18 +49,6 @@ public class CategoryController {
     }
 
     /**
-     * 특정카테고리 조회
-     */
-    @GetMapping("/{boardId}/categories/{categoryId}")
-    public ResponseEntity<CommonResponse<CategoryResponse>> getCategory(
-            @PathVariable Long boardId,
-            @PathVariable Long categoryId
-    ){
-        CategoryResponse response = categoryService.getCategory(boardId, categoryId);
-        return getResponseEntity("해당 카테고리 조회 완료", response);
-    }
-
-    /**
      * 카테고리 수정
      */
     @PatchMapping("/{boardId}/categories/{categoryId}")

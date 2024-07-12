@@ -5,6 +5,7 @@ import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.member.entity.Member;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,9 +23,11 @@ public class Category extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false, unique = true)
     private Long orderNumber;
 
+    @NotBlank
     @Column(nullable = false)
     private String name;
 
@@ -39,18 +42,11 @@ public class Category extends Timestamped {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cardList = new ArrayList<>();
 
-    public Category(String name, Long orderNumber){
+    public Category(String name, Long orderNumber, Member member, Board board){
         this.name = name;
         this.orderNumber = orderNumber;
-    }
-
-    public void setMember(Member member){
         this.member = member;
-    }
-
-    public void setBoard(Board board){
         this.board = board;
-        board.getCategoryList().add(this);
     }
 
     public void updateName(String name){

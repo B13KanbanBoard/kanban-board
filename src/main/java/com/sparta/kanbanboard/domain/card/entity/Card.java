@@ -1,9 +1,10 @@
 package com.sparta.kanbanboard.domain.card.entity;
 
-import com.sparta.kanbanboard.common.base.entity.Timestamped;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.member.entity.Member;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,12 +16,13 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "card")
-public class Card extends Timestamped {
+public class Card {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(nullable = false)
     private String title;
 
@@ -31,13 +33,16 @@ public class Card extends Timestamped {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false, unique = true)
     private Long orderNumber;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
     @ManyToOne
@@ -48,20 +53,12 @@ public class Card extends Timestamped {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public Card(String title, String assignee, String description, Long orderNumber){
+    public Card(String title, String assignee, String description, Long orderNumber, Category category, Member member){
         this.title = title;
         this.assignee = assignee;
         this.description = description;
         this.orderNumber = orderNumber;
-    }
-
-
-    public void setCategory(Category category){
         this.category = category;
-        category.getCardList().add(this);
-    }
-
-    public void setMember(Member member){
         this.member = member;
     }
 

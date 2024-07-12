@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CategoryCreateResponse {
-    private Long id;
-    private String name;
-    private Long orderNumber;
+    private final Long id;
+    private final String name;
+    private final Long orderNumber;
 }
