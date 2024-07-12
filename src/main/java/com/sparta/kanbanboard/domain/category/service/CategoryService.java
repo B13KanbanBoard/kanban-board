@@ -1,10 +1,7 @@
 package com.sparta.kanbanboard.domain.category.service;
 
 
-import com.sparta.kanbanboard.common.exception.customexception.BoardNotFoundException;
-import com.sparta.kanbanboard.common.exception.customexception.CategoryNotFoundException;
-import com.sparta.kanbanboard.common.exception.customexception.MemberAccessDeniedException;
-import com.sparta.kanbanboard.common.exception.customexception.PathMismatchException;
+import com.sparta.kanbanboard.common.exception.customexception.*;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
 import com.sparta.kanbanboard.domain.category.dto.*;
@@ -85,6 +82,9 @@ public class CategoryService {
         return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
     }
 
+    /**
+     * order number 수정
+     */
     @Transactional
     public CategoryUpdateOrderResponse updateOrderNumberCategory(Long boardId, Long categoryId, CategoryUpdateOrderRequest request, Member member) {
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
@@ -95,8 +95,7 @@ public class CategoryService {
         Long newOrderNumber = request.getOrderNumber();
 
         if(newOrderNumber != null){
-            // newOrder가 이미 존재하는 순서인지 확인하는 로직 필요
-            // 순서 바꾸는거에 대한 로직 생각이 더 필요
+            checkCategoryOrderNumberDuplicate(boardId, newOrderNumber);
             tempCategory.updateOrderNumber(newOrderNumber);
         }
 
@@ -136,4 +135,20 @@ public class CategoryService {
             throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
         }
     }
+
+    /**
+     * orderNumber가 이미 존재하는지 중복 확인
+     */
+    public void checkCategoryOrderNumberDuplicate(Long boardId, Long orderNumber) {
+         Board board = boardRepository.findById(boardId).orElseThrow(
+                 () -> new BoardNotFoundException(BOARD_NOT_FOUND));
+         List<Category> categories = board.getCategoryList();
+
+        for (Category category : categories) {
+            if (Objects.equals(category.getOrderNumber(), orderNumber)) {
+                throw new OrderNumberDuplicatedException(DUPLICATED_ORDER_NUMBER);
+            }
+        }
+    }
+
 }

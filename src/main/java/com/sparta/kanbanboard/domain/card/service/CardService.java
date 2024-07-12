@@ -1,9 +1,7 @@
 package com.sparta.kanbanboard.domain.card.service;
 
-import com.sparta.kanbanboard.common.exception.customexception.CardNotFoundException;
-import com.sparta.kanbanboard.common.exception.customexception.CategoryNotFoundException;
-import com.sparta.kanbanboard.common.exception.customexception.MemberAccessDeniedException;
-import com.sparta.kanbanboard.common.exception.customexception.PathMismatchException;
+import com.sparta.kanbanboard.common.exception.customexception.*;
+import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.card.repository.CardRepository;
@@ -152,6 +150,7 @@ public class CardService {
         Long orderNum = req.getOrderNumber();
 
         if(orderNum != null){
+            checkCardOrderNumberDuplicate(categoryId, orderNum);
             tempCard.updateOrderNumber(orderNum);
         }
 
@@ -187,6 +186,21 @@ public class CardService {
         if( (!Objects.equals(card.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
             // 멤버롤 대신 멤버보드에서 롤이 생성자가 맞는지 확인하는 로직으로 변경 필요
             throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
+        }
+    }
+
+    /**
+     * orderNumber가 이미 존재하는지 중복 확인
+     */
+    public void checkCardOrderNumberDuplicate(Long categoryId, Long orderNumber) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
+        List<Card> cards = category.getCardList();
+
+        for (Card card : cards) {
+            if (Objects.equals(card.getOrderNumber(), orderNumber)) {
+                throw new OrderNumberDuplicatedException(DUPLICATED_ORDER_NUMBER);
+            }
         }
     }
 
