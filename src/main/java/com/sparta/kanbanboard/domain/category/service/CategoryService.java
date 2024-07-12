@@ -1,6 +1,7 @@
 package com.sparta.kanbanboard.domain.category.service;
 
 
+import com.sparta.kanbanboard.common.exception.customexception.*;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
 import com.sparta.kanbanboard.domain.category.dto.CategoryCreateResponse;
@@ -18,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
 
 @Service
 @Slf4j(topic = "CategoryService")
@@ -39,8 +42,8 @@ public class CategoryService {
 //            throw new IllegalArgumentException("해당 멤버는 카테고리에 작업 권한이 없습니다");
 //        }
 
-        Board tempBoard = boardRepository.findById(boardId).orElseThrow(NullPointerException::new);
-        // 예외처리 nullpointer -> boardnotfound으로 변경시켜주기
+        Board tempBoard = boardRepository.findById(boardId).orElseThrow(
+                () -> new BoardNotFoundException(BOARD_NOT_FOUND));
         Long orderNum = (long) (tempBoard.getCategoryList().size() + 1);
 
         Category category = new Category(name, orderNum);
@@ -57,8 +60,8 @@ public class CategoryService {
      */
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories(Long boardId){
-        Board tempBoard = boardRepository.findById(boardId).orElseThrow(NullPointerException::new);
-        // 예외처리 nullpointer -> boardnotfound으로 변경시켜주기
+        Board tempBoard = boardRepository.findById(boardId).orElseThrow(
+                () -> new BoardNotFoundException(BOARD_NOT_FOUND));
         List<Category> categories = tempBoard.getCategoryList();
         List<CategoryResponse> result = new ArrayList<>();
         for (Category category : categories) {
@@ -74,8 +77,9 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public CategoryResponse getCategory(Long boardId, Long categoryId){
         checkBoardAndCategoryRelation(boardId, categoryId);
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
-        // 예외처리 만들기
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
+
         return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
     }
 
@@ -84,7 +88,8 @@ public class CategoryService {
      */
     @Transactional
     public CategoryResponse updateCategory(Long boardId, Long categoryId, CategoryUpdateRequest request, Member member) {
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         checkMemberAuthToCategory(member, tempCategory);
         checkBoardAndCategoryRelation(boardId, categoryId);
 
@@ -109,7 +114,8 @@ public class CategoryService {
      */
     @Transactional
     public void deleteCategory(Long boardId, Long categoryId, Member member) {
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         checkMemberAuthToCategory(member, tempCategory);
         checkBoardAndCategoryRelation(boardId, categoryId);
 
@@ -120,9 +126,10 @@ public class CategoryService {
      * 카테고리가 해당보드에 연관된것이 맞는지 확인
      */
     public void checkBoardAndCategoryRelation(Long boardId, Long categoryId) {
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         if(!Objects.equals(tempCategory.getBoard().getId(), boardId)){
-            throw new IllegalArgumentException("Category does not belong to the board");
+            throw new PathMismatchException(BAD_REQUEST);
         }
     }
 
@@ -132,7 +139,7 @@ public class CategoryService {
     public void checkMemberAuthToCategory(Member member, Category category) {
         if( (!Objects.equals(category.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
             // 멤버롤 대신 멤버보드에서 롤이 생성자가 맞는지 확인하는 로직으로 변경 필요
-            throw new IllegalArgumentException("해당 멤버는 카테고리에 작업 권한이 없습니다");
+            throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
         }
     }
 }

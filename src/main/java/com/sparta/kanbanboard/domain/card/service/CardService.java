@@ -1,5 +1,9 @@
 package com.sparta.kanbanboard.domain.card.service;
 
+import com.sparta.kanbanboard.common.exception.customexception.CardNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.CategoryNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.MemberAccessDeniedException;
+import com.sparta.kanbanboard.common.exception.customexception.PathMismatchException;
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.card.repository.CardRepository;
@@ -20,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
+
 @Service
 @Slf4j(topic = "CardService")
 @RequiredArgsConstructor
@@ -36,8 +42,8 @@ public class CardService {
     public CardCreateResponse createCard(Long boardId, Long categoryId, CardCreateRequest req, Member member) {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
 
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
-        // 예외처리 수정
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         Long orderNum = (long) (tempCategory.getCardList().size() + 1);
 
         Card card = new Card(req.getTitle(), req.getAssignee(), req.getDescription(), orderNum);
@@ -55,8 +61,8 @@ public class CardService {
     @Transactional(readOnly = true)
     public List<CardResponse> getAllCards(Long boardId, Long categoryId) {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
-        // 예외처리 수정
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         List<CardResponse> result = new ArrayList<>();
         for(Card card : tempCategory.getCardList()) {
             CardResponse res = new CardResponse(card.getId(), card.getTitle(), card.getAssignee(), card.getDescription(),
@@ -71,8 +77,8 @@ public class CardService {
      */
     public CardResponse getCard(Long boardId, Long categoryId, Long cardId) {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
-        Card tempCard = cardRepository.findById(cardId).orElseThrow(NullPointerException::new);
-        // 예외처리 수정
+        Card tempCard = cardRepository.findById(cardId).orElseThrow(
+                () -> new CardNotFoundException(CARD_NOT_FOUND));
         checkCategoryAndCardRelation(categoryId, tempCard);
 
         return new CardResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getAssignee(), tempCard.getDescription(),
@@ -85,8 +91,8 @@ public class CardService {
     @Transactional
     public CardUpdateDateResponse updateDateCard(Long boardId, Long categoryId, Long cardId, CardUpdateDateRequest req, Member member) {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
-        Card tempCard = cardRepository.findById(cardId).orElseThrow(NullPointerException::new);
-        // 예외처리 수정
+        Card tempCard = cardRepository.findById(cardId).orElseThrow(
+                () -> new CardNotFoundException(CARD_NOT_FOUND));
         checkCategoryAndCardRelation(categoryId, tempCard);
         checkMemberAuthToCard(member, tempCard);
         LocalDate startDate = req.getStartDate();
@@ -108,8 +114,8 @@ public class CardService {
     @Transactional
     public CardUpdateResponse updateCard(Long boardId, Long categoryId, Long cardId, CardUpdateRequest req, Member member) {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
-        Card tempCard = cardRepository.findById(cardId).orElseThrow(NullPointerException::new);
-        // 예외처리 수정
+        Card tempCard = cardRepository.findById(cardId).orElseThrow(
+                () -> new CardNotFoundException(CARD_NOT_FOUND));
         checkCategoryAndCardRelation(categoryId, tempCard);
         checkMemberAuthToCard(member, tempCard);
 
@@ -141,7 +147,8 @@ public class CardService {
     @Transactional
     public void deleteCard(Long boardId, Long categoryId, Long cardId, Member member) {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
-        Card tempCard = cardRepository.findById(cardId).orElseThrow(NullPointerException::new);
+        Card tempCard = cardRepository.findById(cardId).orElseThrow(
+                () -> new CardNotFoundException(CARD_NOT_FOUND));
         // 예외처리 수정
         checkCategoryAndCardRelation(categoryId, tempCard);
         checkMemberAuthToCard(member, tempCard);
@@ -153,7 +160,7 @@ public class CardService {
      */
     public void checkCategoryAndCardRelation(Long categoryId, Card card) {
         if(!Objects.equals(card.getCategory().getId(), categoryId)){
-            throw new IllegalArgumentException("Category does not belong to the board");
+            throw new PathMismatchException(BAD_REQUEST);
         }
     }
 
@@ -163,7 +170,7 @@ public class CardService {
     public void checkMemberAuthToCard(Member member, Card card){
         if( (!Objects.equals(card.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
             // 멤버롤 대신 멤버보드에서 롤이 생성자가 맞는지 확인하는 로직으로 변경 필요
-            throw new IllegalArgumentException("해당 멤버는 카드에 작업 권한이 없습니다");
+            throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
         }
     }
 
