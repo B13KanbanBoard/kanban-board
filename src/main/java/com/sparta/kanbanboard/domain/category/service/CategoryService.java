@@ -84,9 +84,10 @@ public class CategoryService {
      */
     @Transactional
     public CategoryResponse updateCategory(Long boardId, Long categoryId, CategoryUpdateRequest request, Member member) {
-        checkUserAuthToCategory(member, categoryId);
-        checkBoardAndCategoryRelation(boardId, categoryId);
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
+        checkMemberAuthToCategory(member, tempCategory);
+        checkBoardAndCategoryRelation(boardId, categoryId);
+
 
         String newName = request.getName();
         Long newOrderNumber = request.getOrderNumber();
@@ -108,10 +109,10 @@ public class CategoryService {
      */
     @Transactional
     public void deleteCategory(Long boardId, Long categoryId, Member member) {
-        checkUserAuthToCategory(member, categoryId);
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
+        checkMemberAuthToCategory(member, tempCategory);
         checkBoardAndCategoryRelation(boardId, categoryId);
 
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
         categoryRepository.delete(tempCategory);
     }
 
@@ -128,9 +129,9 @@ public class CategoryService {
     /**
      * 카테고리가 해당 유저가 만든것인지 확인
      */
-    public void checkUserAuthToCategory(Member member, Long categoryId) {
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(NullPointerException::new);
-        if( (!Objects.equals(tempCategory.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
+    public void checkMemberAuthToCategory(Member member, Category category) {
+        if( (!Objects.equals(category.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
+            // 멤버롤 대신 멤버보드에서 롤이 생성자가 맞는지 확인하는 로직으로 변경 필요
             throw new IllegalArgumentException("해당 멤버는 카테고리에 작업 권한이 없습니다");
         }
     }

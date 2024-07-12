@@ -23,8 +23,10 @@ public class Category extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
+    @Column(nullable = false)
     private Long orderNumber;
 
+    @Column(nullable = false)
     private String name;
 
     @ManyToOne

@@ -2,13 +2,14 @@ package com.sparta.kanbanboard.domain.card.controller;
 
 import com.sparta.kanbanboard.common.base.dto.CommonResponse;
 import com.sparta.kanbanboard.common.security.UserDetailsImpl;
-import com.sparta.kanbanboard.domain.card.dto.CardCreateRequest;
-import com.sparta.kanbanboard.domain.card.dto.CardCreateResponse;
+import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.sparta.kanbanboard.common.util.ControllerUtil.getResponseEntity;
 
@@ -20,7 +21,7 @@ public class CardController {
     private final CardService cardService;
 
     /**
-     * 카테고리 생성
+     * 카드 생성
      */
     @PostMapping("/{boardId}/categories/{categoryId}/cards")
     public ResponseEntity<CommonResponse<CardCreateResponse>> createCard(
@@ -32,4 +33,51 @@ public class CardController {
         CardCreateResponse response = cardService.createCard(boardId, categoryId, req, userDetails.getMember());
         return getResponseEntity("카드 생성 완료", response);
     }
+
+    /**
+     * 카드 전체 조회
+     */
+    @GetMapping("/{boardId}/categories/{categoryId}/cards")
+    public ResponseEntity<CommonResponse<List<CardResponse>>> getAllCards(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId
+    ){
+        List<CardResponse> response = cardService.getAllCards(boardId, categoryId);
+        return getResponseEntity("카드 전체 조회 완료", response);
+    }
+
+    /**
+     * 특정 카드 조회
+     */
+    @GetMapping("/{boardId}/categories/{categoryId}/cards/{cardId}")
+    public ResponseEntity<CommonResponse<CardResponse>> getCard(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId,
+            @PathVariable Long cardId
+    ){
+        CardResponse response = cardService.getCard(boardId, categoryId, cardId);
+        return getResponseEntity("카드 조회 완료", response);
+    }
+
+
+    /**
+     * 시작일자, 마감일자 설정 :
+     * private LocalDate startDate;
+     * private LocalDate endDate;
+     */
+    @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}/update-date")
+    public ResponseEntity<CommonResponse<CardUpdateDateResponse>> updateDateCard(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId,
+            @PathVariable Long cardId,
+            @RequestBody CardUpdateDateRequest req,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        CardUpdateDateResponse response = cardService.updateDateCard(boardId, categoryId, cardId, req, userDetails.getMember());
+        return getResponseEntity("시작/마감 일자 수정 완료", response);
+    }
+
+    /**
+     * 카드 수정
+     */
 }

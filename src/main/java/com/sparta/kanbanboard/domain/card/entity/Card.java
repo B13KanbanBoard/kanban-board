@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -18,14 +21,24 @@ public class Card extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
     // member email 로 저장
+    @Column(nullable = false)
     private String assignee;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private Long orderNumber;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
@@ -50,6 +63,14 @@ public class Card extends Timestamped {
 
     public void setMember(Member member){
         this.member = member;
+    }
+
+    public void updateStartDate(LocalDate startDate){
+        this.startDate = startDate;
+    }
+
+    public void updateEndDate(LocalDate endDate){
+        this.endDate = endDate;
     }
 
 
