@@ -13,6 +13,9 @@ public enum CommonErrorCode implements ErrorCode {
     AUTH_USER_FORBIDDEN(StatusCode.FORBIDDEN.getCode(), "접근 권한이 없습니다."),
     METHOD_NOT_ALLOWED(StatusCode.BAD_REQUEST.getCode(), "요청 메서드가 잘 못 되었습니다."),
     NO_RESOURCE_FOUND_EXCEPTION(StatusCode.BAD_REQUEST.getCode(), "요청 메서드가 잘 못 되었습니다."),
+    CATEGORY_NOT_FOUND(StatusCode.NOT_FOUND.getCode(), "요청된 카테고리를 찾을 수 없습니다."),
+    CARD_NOT_FOUND(StatusCode.NOT_FOUND.getCode(), "요청된 카드를 찾을 수 없습니다."),
+    BOARD_NOT_FOUND(StatusCode.NOT_FOUND.getCode(), "요청된 보드를 찾을 수 없습니다.")
     ;
 
     private final Integer httpStatusCode;
