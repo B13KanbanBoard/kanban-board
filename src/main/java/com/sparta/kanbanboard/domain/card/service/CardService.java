@@ -135,6 +135,18 @@ public class CardService {
                 tempCard.getDescription(), tempCard.getOrderNumber());
     }
 
+    /**
+     * 카드 삭제
+     */
+    @Transactional
+    public void deleteCard(Long boardId, Long categoryId, Long cardId, Member member) {
+        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+        Card tempCard = cardRepository.findById(cardId).orElseThrow(NullPointerException::new);
+        // 예외처리 수정
+        checkCategoryAndCardRelation(categoryId, tempCard);
+        checkMemberAuthToCard(member, tempCard);
+        cardRepository.delete(tempCard);
+    }
 
     /**
      * 카테고리, 카드 연관 확인
@@ -154,4 +166,5 @@ public class CardService {
             throw new IllegalArgumentException("해당 멤버는 카드에 작업 권한이 없습니다");
         }
     }
+
 }

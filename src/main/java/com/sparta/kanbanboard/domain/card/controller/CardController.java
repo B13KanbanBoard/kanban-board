@@ -91,4 +91,18 @@ public class CardController {
         CardUpdateResponse response = cardService.updateCard(boardId, categoryId, cardId, req, userDetails.getMember());
         return getResponseEntity("카드 수정 완료", response);
     }
+
+    /**
+     * 카드 삭제
+     */
+    @DeleteMapping("/{boardId}/categories/{categoryId}/cards/{cardId}")
+    public ResponseEntity<CommonResponse<Long>> deleteCard(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId,
+            @PathVariable Long cardId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        cardService.deleteCard(boardId, categoryId, cardId, userDetails.getMember());
+        return getResponseEntity("카드 삭제 완료", cardId);
+    }
 }
