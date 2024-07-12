@@ -1,0 +1,78 @@
+### 테스트에 사용할 데이터
+@email1 = test1@gmail.com
+@password1 = Abcdefg123!
+@name1 = 홍길동
+
+@email2 = test2@gmail.com
+@password2 = Abcdefg123!
+@name2 = 홍길동2
+
+@email3 = test3@gmail.com
+@password3 = Abcdefg123!
+@name3 = 홍길동3
+
+### 회원가입
+POST http://localhost:8080/api/members/signup
+Content-Type: application/json
+
+{
+  "email" : "{{email1}}",
+  "password" : "{{password1}}",
+  "name" : "{{name1}}"
+}
+
+### 로그인
+GET http://localhost:8080/api/members/login
+Content-Type: application/json
+
+{
+  "email" : "{{email1}}",
+  "password" : "{{password1}}"
+}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("Authorization-refresh", response.headers.valueOf("Authorization-refresh"));
+%}
+
+
+### 토큰 재발급
+POST http://localhost:8080/api/members/refresh-token
+Authorization-refresh:{{Authorization-refresh}}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("Authorization-refresh", response.headers.valueOf("Authorization-refresh"));
+%}
+
+
+### 프로필 조회
+GET http://localhost:8080/api/members
+Authorization:{{Authorization}}
+Authorization-refresh:{{Authorization-refresh}}
+
+
+### 비밀번호 수정
+PATCH http://localhost:8080/api/members/update-pwd
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "oldPassword": "Abcdefg123!",
+  "newPassword": "ABcdefg123!"
+}
+
+
+### 프로필 수정
+PATCH http://localhost:8080/api/members/update-profile
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "name": "홍길동10"
+}
+
+
+### 회원 탈퇴
+DELETE http://localhost:8080/api/members/3
+Authorization: {{Authorization}}

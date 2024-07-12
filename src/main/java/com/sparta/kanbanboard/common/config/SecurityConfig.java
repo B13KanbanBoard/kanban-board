@@ -70,7 +70,8 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests((requests) -> requests
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() //resource 접근 허용 설정
-                .requestMatchers(HttpMethod.POST,"/api/members").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/members/signup").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/members/refresh-token").permitAll()
                 .anyRequest().authenticated()
         );
 
