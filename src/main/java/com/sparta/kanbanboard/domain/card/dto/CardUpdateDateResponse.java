@@ -2,7 +2,6 @@ package com.sparta.kanbanboard.domain.card.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 

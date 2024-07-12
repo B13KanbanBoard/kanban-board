@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
 
@@ -61,15 +61,19 @@ public class CardService {
     @Transactional(readOnly = true)
     public List<CardResponse> getAllCards(Long boardId, Long categoryId) {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
-        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
-        List<CardResponse> result = new ArrayList<>();
-        for(Card card : tempCategory.getCardList()) {
-            CardResponse res = new CardResponse(card.getId(), card.getTitle(), card.getAssignee(), card.getDescription(),
-                    card.getStartDate(), card.getEndDate());
-            result.add(res);
-        }
-        return result;
+
+        return cardRepository.getCardListSortOrderNumber(categoryId)
+                .stream()
+                .map(m ->
+                        CardResponse.builder()
+                                .cardId(m.getId())
+                                .title(m.getTitle())
+                                .assignee(m.getAssignee())
+                                .description(m.getDescription())
+                                .startDate(m.getStartDate())
+                                .endDate(m.getEndDate())
+                                .build()
+                ).collect(Collectors.toList());
     }
 
     /**
@@ -149,7 +153,6 @@ public class CardService {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
         Card tempCard = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(CARD_NOT_FOUND));
-        // 예외처리 수정
         checkCategoryAndCardRelation(categoryId, tempCard);
         checkMemberAuthToCard(member, tempCard);
         cardRepository.delete(tempCard);

@@ -1,7 +1,10 @@
 package com.sparta.kanbanboard.domain.category.service;
 
 
-import com.sparta.kanbanboard.common.exception.customexception.*;
+import com.sparta.kanbanboard.common.exception.customexception.BoardNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.CategoryNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.MemberAccessDeniedException;
+import com.sparta.kanbanboard.common.exception.customexception.PathMismatchException;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
 import com.sparta.kanbanboard.domain.category.dto.CategoryCreateResponse;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
 
@@ -36,11 +40,6 @@ public class CategoryService {
     @Transactional
     public CategoryCreateResponse createCategory(Long boardId, String name, Member member) {
         // 멤버가 매니저 역할인지 확인하는 메서드 추가하기
-//        Board tempBoard = boardRepository.findById(boardId).orElseThrow(NullPointerException::new);
-//        // 예외처리 수정
-//        if( (!Objects.equals(tempBoard.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
-//            throw new IllegalArgumentException("해당 멤버는 카테고리에 작업 권한이 없습니다");
-//        }
 
         Board tempBoard = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(BOARD_NOT_FOUND));
@@ -60,15 +59,15 @@ public class CategoryService {
      */
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories(Long boardId){
-        Board tempBoard = boardRepository.findById(boardId).orElseThrow(
-                () -> new BoardNotFoundException(BOARD_NOT_FOUND));
-        List<Category> categories = tempBoard.getCategoryList();
-        List<CategoryResponse> result = new ArrayList<>();
-        for (Category category : categories) {
-            CategoryResponse res = new CategoryResponse(category.getId(), category.getName(), category.getOrderNumber());
-            result.add(res);
-        }
-        return result;
+        return categoryRepository.getCategoryListSortOrderNumber(boardId)
+                .stream()
+                .map(m ->
+                        CategoryResponse.builder()
+                                .id(m.getId())
+                                .name(m.getName())
+                                .orderNumber(m.getOrderNumber())
+                                .build()
+                ).collect(Collectors.toList());
     }
 
     /**
