@@ -11,5 +11,4 @@ public class CardUpdateRequest {
     private String assignee;
 
     private String description;
-    private Long orderNumber;
 }

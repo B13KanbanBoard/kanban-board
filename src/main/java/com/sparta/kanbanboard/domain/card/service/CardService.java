@@ -124,7 +124,6 @@ public class CardService {
         String title = req.getTitle();
         String assignee = req.getAssignee();
         String description = req.getDescription();
-        Long orderNum = req.getOrderNumber();
 
         if(title != null){
             tempCard.updateTitle(title);
@@ -135,12 +134,28 @@ public class CardService {
         if(description != null){
             tempCard.updateDescription(description);
         }
+
+        return new CardUpdateResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getAssignee(),
+                tempCard.getDescription(), tempCard.getOrderNumber());
+    }
+
+    /**
+     * 카드 orderNumber 수정
+     */
+    public CardUpdateOrderResponse updateOrderNumberCard(Long boardId, Long categoryId, Long cardId, CardUpdateOrderRequest req, Member member) {
+        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+        Card tempCard = cardRepository.findById(cardId).orElseThrow(
+                () -> new CardNotFoundException(CARD_NOT_FOUND));
+        checkCategoryAndCardRelation(categoryId, tempCard);
+        checkMemberAuthToCard(member, tempCard);
+
+        Long orderNum = req.getOrderNumber();
+
         if(orderNum != null){
             tempCard.updateOrderNumber(orderNum);
         }
 
-        return new CardUpdateResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getAssignee(),
-                tempCard.getDescription(), tempCard.getOrderNumber());
+        return new CardUpdateOrderResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getOrderNumber());
     }
 
     /**

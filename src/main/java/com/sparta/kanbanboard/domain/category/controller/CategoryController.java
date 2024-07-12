@@ -3,10 +3,7 @@ package com.sparta.kanbanboard.domain.category.controller;
 
 import com.sparta.kanbanboard.common.base.dto.CommonResponse;
 import com.sparta.kanbanboard.common.security.UserDetailsImpl;
-import com.sparta.kanbanboard.domain.category.dto.CategoryCreateRequest;
-import com.sparta.kanbanboard.domain.category.dto.CategoryCreateResponse;
-import com.sparta.kanbanboard.domain.category.dto.CategoryResponse;
-import com.sparta.kanbanboard.domain.category.dto.CategoryUpdateRequest;
+import com.sparta.kanbanboard.domain.category.dto.*;
 import com.sparta.kanbanboard.domain.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +56,20 @@ public class CategoryController {
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
         CategoryResponse response = categoryService.updateCategory(boardId, categoryId, req, userDetails.getMember());
+        return getResponseEntity("카테고리 수정 완료", response);
+    }
+
+    /**
+     * 카테고리 순서 수정
+     */
+    @PatchMapping("/{boardId}/categories/{categoryId}/update-order")
+    public ResponseEntity<CommonResponse<CategoryUpdateOrderResponse>> updateOrderNumberCategory(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId,
+            @RequestBody CategoryUpdateOrderRequest req,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        CategoryUpdateOrderResponse response = categoryService.updateOrderNumberCategory(boardId, categoryId, req, userDetails.getMember());
         return getResponseEntity("카테고리 수정 완료", response);
     }
 

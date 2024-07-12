@@ -7,9 +7,7 @@ import com.sparta.kanbanboard.common.exception.customexception.MemberAccessDenie
 import com.sparta.kanbanboard.common.exception.customexception.PathMismatchException;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
-import com.sparta.kanbanboard.domain.category.dto.CategoryCreateResponse;
-import com.sparta.kanbanboard.domain.category.dto.CategoryResponse;
-import com.sparta.kanbanboard.domain.category.dto.CategoryUpdateRequest;
+import com.sparta.kanbanboard.domain.category.dto.*;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.category.repository.CategoryRepository;
 import com.sparta.kanbanboard.domain.member.entity.Member;
@@ -79,18 +77,30 @@ public class CategoryService {
 
 
         String newName = request.getName();
-        Long newOrderNumber = request.getOrderNumber();
 
         if(newName != null){
             tempCategory.updateName(newName);
         }
+
+        return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
+    }
+
+    @Transactional
+    public CategoryUpdateOrderResponse updateOrderNumberCategory(Long boardId, Long categoryId, CategoryUpdateOrderRequest request, Member member) {
+        Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
+        checkMemberAuthToCategory(member, tempCategory);
+        checkBoardAndCategoryRelation(boardId, categoryId);
+
+        Long newOrderNumber = request.getOrderNumber();
+
         if(newOrderNumber != null){
             // newOrder가 이미 존재하는 순서인지 확인하는 로직 필요
             // 순서 바꾸는거에 대한 로직 생각이 더 필요
             tempCategory.updateOrderNumber(newOrderNumber);
         }
 
-        return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
+        return new CategoryUpdateOrderResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
     }
 
     /**

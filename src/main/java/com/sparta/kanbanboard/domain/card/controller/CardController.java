@@ -61,6 +61,20 @@ public class CardController {
         return getResponseEntity("카드 조회 완료", response);
     }
 
+    /**
+     * 카드 수정
+     */
+    @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}")
+    public ResponseEntity<CommonResponse<CardUpdateResponse>> updateCard(
+            @PathVariable Long boardId,
+            @PathVariable Long categoryId,
+            @PathVariable Long cardId,
+            @RequestBody CardUpdateRequest req,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        CardUpdateResponse response = cardService.updateCard(boardId, categoryId, cardId, req, userDetails.getMember());
+        return getResponseEntity("카드 수정 완료", response);
+    }
 
     /**
      * 시작일자, 마감일자 설정 :
@@ -77,19 +91,16 @@ public class CardController {
         return getResponseEntity("시작/마감 일자 수정 완료", response);
     }
 
-    /**
-     * 카드 수정
-     */
-    @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}")
-    public ResponseEntity<CommonResponse<CardUpdateResponse>> updateCard(
+    @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}/update-order")
+    public ResponseEntity<CommonResponse<CardUpdateOrderResponse>> updateOrderNumberCard(
             @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @PathVariable Long cardId,
-            @RequestBody CardUpdateRequest req,
+            @RequestBody CardUpdateOrderRequest req,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CardUpdateResponse response = cardService.updateCard(boardId, categoryId, cardId, req, userDetails.getMember());
-        return getResponseEntity("카드 수정 완료", response);
+        CardUpdateOrderResponse response = cardService.updateOrderNumberCard(boardId, categoryId, cardId, req, userDetails.getMember());
+        return getResponseEntity("카드 순서 수정 완료", response);
     }
 
     /**
