@@ -2,6 +2,7 @@ package com.sparta.kanbanboard.domain.board.entity;
 
 import com.sparta.kanbanboard.common.base.entity.Timestamped;
 import com.sparta.kanbanboard.domain.member.entity.Member;
+import com.sparta.kanbanboard.domain.category.entity.Category;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +18,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -38,6 +42,9 @@ public class Board extends Timestamped {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberBoard> memberBoardList = new ArrayList<>();
+  
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Category> categoryList = new ArrayList<>();
 
     @Builder
     public Board(Member member, String boardName, String content) {

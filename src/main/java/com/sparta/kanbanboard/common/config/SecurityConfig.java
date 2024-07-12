@@ -72,8 +72,19 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() //resource 접근 허용 설정
                 .requestMatchers(HttpMethod.POST,"/api/members/signup").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/members/refresh-token").permitAll()
+
+                .requestMatchers("/").permitAll()// 메인 페이지 요청 허가
+                .requestMatchers("/api/members/login-page").permitAll() // 로그인 페이지
+                .requestMatchers("/api/members/signup").permitAll() // 회원 가입 페이지
+                .requestMatchers(HttpMethod.POST,"/api/members/signup2").permitAll() // 로그인 페이지 form data 형식
                 .anyRequest().authenticated()
         );
+
+        http.formLogin((formLogin) ->
+                formLogin
+                        .loginPage("/api/member/login-page").permitAll()
+        );
+
 
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
