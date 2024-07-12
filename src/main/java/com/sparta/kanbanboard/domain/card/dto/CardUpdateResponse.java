@@ -1,4 +1,4 @@
-package com.sparta.kanbanboard.domain.category.dto;
+package com.sparta.kanbanboard.domain.card.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

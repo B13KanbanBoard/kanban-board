@@ -7,8 +7,8 @@ import com.sparta.kanbanboard.common.exception.customexception.PathMismatchExcep
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.card.repository.CardRepository;
-import com.sparta.kanbanboard.domain.category.dto.CardUpdateRequest;
-import com.sparta.kanbanboard.domain.category.dto.CardUpdateResponse;
+import com.sparta.kanbanboard.domain.card.dto.CardUpdateRequest;
+import com.sparta.kanbanboard.domain.card.dto.CardUpdateResponse;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.category.repository.CategoryRepository;
 import com.sparta.kanbanboard.domain.category.service.CategoryService;
@@ -46,7 +46,7 @@ public class CardService {
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         Long orderNum = (long) (tempCategory.getCardList().size() + 1);
 
-        Card card = new Card(req.getTitle(), req.getAssignee(), req.getDescription(), orderNum, tempCategory, member);
+        Card card = new Card(req.getTitle(), orderNum, tempCategory, member);
 
         cardRepository.save(card);
 

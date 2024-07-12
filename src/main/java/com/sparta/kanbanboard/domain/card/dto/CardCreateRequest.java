@@ -7,7 +7,4 @@ import lombok.Getter;
 public class CardCreateRequest {
     @NotBlank
     private String title;
-
-    private String assignee;
-    private String description;
 }

@@ -53,10 +53,8 @@ public class Card {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public Card(String title, String assignee, String description, Long orderNumber, Category category, Member member){
+    public Card(String title, Long orderNumber, Category category, Member member){
         this.title = title;
-        this.assignee = assignee;
-        this.description = description;
         this.orderNumber = orderNumber;
         this.category = category;
         this.member = member;
