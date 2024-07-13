@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
-
     Page<Board> findById(Long boardId, Pageable pageable);
     //optional이 들어가야함
 }
