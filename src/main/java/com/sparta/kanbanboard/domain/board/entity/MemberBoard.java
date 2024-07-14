@@ -11,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,24 +23,35 @@ public class MemberBoard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false)
+    @JoinColumn(name = "board_id")
     private Board board;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BoardRole role;
 
-    public MemberBoard(Board board, Member member, BoardRole boardRole) {
-        this.board = board;
+    @Builder(access = AccessLevel.PRIVATE)
+    private MemberBoard(Member member, Board board, BoardRole boardRole) {
         this.member = member;
+        this.board = board;
         this.role = boardRole;
+    }
+
+    /**
+     * MemberBoard 생성
+     */
+    public static MemberBoard createMemberBoard (Member member, Board board, BoardRole boardRole) {
+        return MemberBoard.builder()
+                .member(member)
+                .board(board)
+                .boardRole(boardRole)
+                .build();
     }
 }

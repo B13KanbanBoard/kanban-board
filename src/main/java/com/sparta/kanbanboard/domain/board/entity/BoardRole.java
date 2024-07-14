@@ -2,23 +2,20 @@ package com.sparta.kanbanboard.domain.board.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum BoardRole {
 
     MANAGER("MANAGER"),
     PARTICIPANTS("PARTICIPANTS");
 
-    private final String BoardRole;
+    private final String boardRole;
 
-    BoardRole(String boardRole) {
-        BoardRole = boardRole;
-    }
-
-    public String getRole() {
+    public String getBoardRole(){
         return switch(this) {
-            case MANAGER -> "MANAGER";
-            case PARTICIPANTS -> "PARTICIPANTS";
+            case MANAGER, PARTICIPANTS -> this.boardRole;
         };
     }
 }

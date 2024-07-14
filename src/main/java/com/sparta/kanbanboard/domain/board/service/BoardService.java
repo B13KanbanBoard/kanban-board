@@ -1,12 +1,20 @@
 package com.sparta.kanbanboard.domain.board.service;
 
-import com.sparta.kanbanboard.common.base.dto.CommonResponse;
+import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.CANNOT_DELETE_SELF;
+import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.CANNOT_INVITE_SELF;
+import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.INAPPROPRIATE_MEMBER_BOARD;
+import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.NOT_FOUND_BOARD;
+import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.NOT_FOUND_USER;
+
+import com.sparta.kanbanboard.common.exception.customexception.BoardInappropriateException;
 import com.sparta.kanbanboard.common.exception.customexception.BoardNotFoundException;
-import com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode;
+import com.sparta.kanbanboard.common.exception.customexception.MemberNotFoundException;
+import com.sparta.kanbanboard.domain.board.dto.BoardDetailResponse;
 import com.sparta.kanbanboard.domain.board.dto.BoardRequest;
 import com.sparta.kanbanboard.domain.board.dto.BoardResponse;
-import com.sparta.kanbanboard.domain.board.dto.MemberBoardRequest;
-import com.sparta.kanbanboard.domain.board.dto.MemberBoardResponse;
+import com.sparta.kanbanboard.domain.board.dto.InviteMemberRequest;
+import com.sparta.kanbanboard.domain.board.dto.InviteMemberResponse;
+import com.sparta.kanbanboard.domain.board.dto.PageBoardResponse;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.board.entity.BoardRole;
 import com.sparta.kanbanboard.domain.board.entity.MemberBoard;
@@ -14,9 +22,7 @@ import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
 import com.sparta.kanbanboard.domain.board.repository.MemberBoardRepository;
 import com.sparta.kanbanboard.domain.member.entity.Member;
 import com.sparta.kanbanboard.domain.member.repository.MemberRepository;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,77 +38,137 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberBoardRepository memberBoardRepository;
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
+    /**
+     * Board 생성
+     */
     @Transactional
-    public BoardResponse createBoard(BoardRequest request, Member member) {
+    public BoardResponse createBoard (BoardRequest request, Member loginMember) {
+        Board board = Board.createBoard(request.getBoardName(), request.getContent());
 
-        Board board = new Board(member, request.getBoardName(), request.getContent());
-        MemberBoard memberBoard = new MemberBoard(board,member,BoardRole.MANAGER);
+        MemberBoard memberBoard = MemberBoard.createMemberBoard(loginMember, board, BoardRole.MANAGER);
         board.addMemberBoard(memberBoard);
-        Board savedBoard = boardRepository.save(board);
-        return new BoardResponse(savedBoard);
+
+        boardRepository.save(board);
+
+        return BoardResponse.of(board);
     }
 
+    /**
+     * Board page 조회
+     */
     @Transactional(readOnly = true)
-    public Page<BoardResponse> getBoards(Long boardId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
-        Page<Board> boardPage = boardRepository.findById(boardId, pageable);
-        return boardPage.map(BoardResponse::new);
+    public PageBoardResponse getBoards (Integer pageNum, Integer size, Member loginMember) {
+        Pageable pageable = PageRequest.of(pageNum-1, size, Sort.by(Direction.DESC, "createdAt"));
+        Page<Board> boardPage = boardRepository.searchMyBoards(loginMember.getId(), pageable);
+
+        return PageBoardResponse.of(pageNum, boardPage.getTotalElements(), boardPage);
     }
 
-    @Transactional
-    public CommonResponse<BoardResponse> updateBoard(Long boardId, BoardRequest request, Member member) {
-        Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new BoardNotFoundException(BoardErrorCode.NOT_FOUND_BOARD));
-
-        board.update(request.getBoardName(), request.getContent());
-        BoardResponse response = new BoardResponse(board);
-        return new CommonResponse<>(true,200,"보드 수정이 성공적으로 되었습니다.",response);
+    /**
+     * Board 상세 조회
+     */
+    @Transactional(readOnly = true)
+    public List<BoardDetailResponse> getBoardDetails (Long boardId) {
+        return boardRepository.searchBoardDetails(boardId);
     }
 
+    /**
+     * Board 수정
+     */
     @Transactional
-    public CommonResponse<Long> deleteBoard(Long boardId, Long id) {
-        Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new BoardNotFoundException(BoardErrorCode.NOT_FOUND_BOARD));
+    public BoardResponse updateBoard (Long boardId, BoardRequest request, Member loginMember) {
+        Board board = findById(boardId);
+        checkMemberAboutBoard(boardId, loginMember.getId());
+
+        board.updateBoard(request.getBoardName(), request.getContent());
+
+        return BoardResponse.of(board);
+    }
+
+    /**
+     * Board 삭제
+     */
+    @Transactional
+    public String deleteBoard (Long boardId, Member loginMember) {
+        Board board = findById(boardId);
+        checkMemberAboutBoard(boardId, loginMember.getId());
 
         boardRepository.delete(board);
-        return new CommonResponse<>(true, 200, "보드 삭제가 성공적으로 되었습니다.", boardId);
+
+        return board.getBoardName();
     }
 
+    /**
+     * Board에 member 초대
+     */
     @Transactional
-    public List<MemberBoardResponse> inviteMemberBoard(MemberBoardRequest request, Member currentUser)
-        throws Exception {
-        Long boardId = request.getBoardId();
-        List<Long> memberIds = request.getMemberIdList();
+    public InviteMemberResponse inviteMember (InviteMemberRequest request, Member loginMember) {
+        Board board = findById(request.getBoardId());
+        checkMemberAboutBoard(request.getBoardId(), loginMember.getId());
 
-        // 현재 사용자가 필요한 권한을 가지고 있는지 확인
-        Optional<MemberBoard> currentUserRole = memberBoardRepository.findByMemberAndBoard(currentUser, boardRepository.findById(boardId).orElseThrow());
-        if(!currentUserRole.isPresent() || !currentUserRole.get().getRole().equals(BoardRole.MANAGER)) {
-            throw new Exception("해당 보드에 사용자를 초대할 권한이 없습니다.");
+        boolean isSelfInvite = request.getMemberIdList().stream()
+                        .anyMatch(inviteMemberId -> inviteMemberId.equals(loginMember.getId()));
+
+        if (isSelfInvite) {
+            throw new BoardInappropriateException(CANNOT_INVITE_SELF);
         }
 
-        Board board = boardRepository.findById(boardId).orElseThrow(()-> new BoardNotFoundException(BoardErrorCode.NOT_FOUND_BOARD));
-
-        List<MemberBoardResponse> invitedMembers = new ArrayList<>();
-
-        for(Long memberId : memberIds) {
-            // 사용자가 존재하는지 확인
-            Member member = memberRepository.findById(memberId).orElseThrow(()-> new Exception("ID" + memberId + "인 사용자가 존재하지 않습니다"));
-
-            // 사용자가 이미 보드에 초대되었는지 확인
-            Optional<MemberBoard> existingMemberBoard = memberBoardRepository.findByMemberAndBoard(currentUser,  boardRepository.findById(boardId).orElseThrow());
-            if (existingMemberBoard.isPresent()) {
-                throw new Exception("ID " + memberId + "인 사용자가 이미 보드에 초대되었습니다.");
-            }
-
-            // 생성자를 사용하여 멤버를 기본 역할로 보드에 추가
-            MemberBoard memberBoard = new MemberBoard(board, member, BoardRole.PARTICIPANTS);
-            memberBoardRepository.save(memberBoard);
-
-            // 초대된 사용자 정보를 MemberBoardResponse로 변환하여 리스트에 추가
-            invitedMembers.add(new MemberBoardResponse(member, board, BoardRole.PARTICIPANTS));
+        List<Member> inviteMemberList = memberRepository.findByIdIn(request.getMemberIdList());
+        if(inviteMemberList.isEmpty()){
+            throw new MemberNotFoundException(NOT_FOUND_USER);
         }
-        return invitedMembers;
+
+        inviteMemberList.stream()
+                .map(m -> MemberBoard.createMemberBoard(m, board, BoardRole.PARTICIPANTS))
+                .forEach(board::addMemberBoard);
+
+        return InviteMemberResponse.of(board.getId(), inviteMemberList);
     }
+
+    /**
+     * Board에 멤버 삭제
+     */
+    @Transactional
+    public String deleteBoardMember(Long boardId, Long memberId, Member loginMember) {
+        Board board = findById(boardId);
+        checkMemberAboutBoard(boardId, loginMember.getId());
+
+        MemberBoard memberBoard = memberBoardRepository.findByBoardIdAndMemberId(boardId, memberId)
+                .orElseThrow(
+                        () -> new BoardNotFoundException(NOT_FOUND_BOARD)
+                );
+
+        if(loginMember.getId().equals(memberBoard.getMember().getId())){
+            throw new BoardInappropriateException(CANNOT_DELETE_SELF);
+        }
+
+        board.getMemberBoardList().remove(memberBoard);
+
+        return memberBoard.getMember().getEmail();
+    }
+
+    /**
+     * id로 Board 조회
+     */
+    private Board findById(Long boardId) {
+        return boardRepository.findById(boardId).orElseThrow(
+                () -> new BoardNotFoundException(NOT_FOUND_BOARD)
+        );
+    }
+
+    /**
+     * MemberBoard 존재 확인 및 권한 확인
+     */
+    private void checkMemberAboutBoard(Long boardId, Long memberId) {
+        MemberBoard memberBoard = memberBoardRepository.findByBoardIdAndMemberId(boardId, memberId).orElseThrow(
+                () -> new BoardNotFoundException(NOT_FOUND_BOARD)
+        );
+
+        if(BoardRole.PARTICIPANTS.equals(memberBoard.getRole())){
+            throw new BoardInappropriateException(INAPPROPRIATE_MEMBER_BOARD);
+        }
+    }
+
 }
