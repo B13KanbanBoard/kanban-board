@@ -44,8 +44,8 @@ public class Member extends Timestamped {
     @Column
     private String refreshToken;
 
-    @Builder
-    public Member(String email, String password, String name, MemberRole role) {
+    @Builder(access = AccessLevel.PRIVATE)
+    private Member(String email, String password, String name, MemberRole role) {
         this.email = email;
         this.password = password;
         this.name = name;

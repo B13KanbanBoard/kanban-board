@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BoardRepository extends JpaRepository<Board, Long> {
-    Page<Board> findById(Long boardId, Pageable pageable);
-    //optional이 들어가야함
+public interface BoardRepository extends JpaRepository<Board, Long>, BoardRepositoryCustom {
+
 }

@@ -4,6 +4,7 @@ import com.sparta.kanbanboard.common.exception.customexception.globalexception.G
 import com.sparta.kanbanboard.common.exception.errorCode.ErrorCode;
 
 public class BoardNotFoundException extends GlobalNotFoundException {
+
     public BoardNotFoundException(ErrorCode errorCode) {
         super(errorCode);
     }

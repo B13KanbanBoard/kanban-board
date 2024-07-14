@@ -2,19 +2,15 @@ package com.sparta.kanbanboard.domain.board.dto;
 
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.member.entity.Member;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
 public class BoardRequest {
-    private String boardName;
-    private String content;
 
-    public Board toEntity(Member member) {
-        return Board.builder()
-            .member(member)
-            .boardName(boardName)
-            .content(content)
-            .build();
-    }
+    @NotBlank(message = "Board의 제목을 입력하세요.")
+    private String boardName;
+    @NotBlank(message = "Board의 한 줄 설명을 입력하세요.")
+    private String content;
 
 }

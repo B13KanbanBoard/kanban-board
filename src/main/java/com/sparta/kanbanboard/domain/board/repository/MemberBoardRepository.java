@@ -11,14 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberBoardRepository extends JpaRepository<MemberBoard, Long> {
 
-    // 특정 멤버와 보드에 해당하는 MemberBoard 엔티티를 찾는 메서드
-    Optional<MemberBoard> findByMemberIdAndBoardId(Long memberId, Long boardId);
-
-//    Optional<MemberBoard> findByMemberIdAndBoardId(Long BoardId, Long mebmerId);
-
-    Optional<MemberBoard> findByMemberAndBoard(Member member, Board board);
-
-    // 특정 보드에 해당하는 모든 MemberBoard 엔티티를 찾는 메서드
-    List<MemberBoard> findByBoardId(Board board);
+    Optional<MemberBoard> findByBoardIdAndMemberId(Long boardId, Long memberId);
 
 }
