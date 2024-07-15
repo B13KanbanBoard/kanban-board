@@ -63,7 +63,7 @@ public class BoardService {
         Pageable pageable = PageRequest.of(pageNum-1, size, Sort.by(Direction.DESC, "createdAt"));
         Page<Board> boardPage = boardRepository.searchMyBoards(loginMember.getId(), pageable);
 
-        return PageBoardResponse.of(pageNum, boardPage.getTotalElements(), boardPage);
+        return PageBoardResponse.of(boardPage.getTotalPages(), pageNum, boardPage.getTotalElements(), boardPage);
     }
 
     /**
