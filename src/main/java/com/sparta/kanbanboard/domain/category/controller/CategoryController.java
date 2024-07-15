@@ -42,9 +42,10 @@ public class CategoryController {
      */
     @GetMapping("/{boardId}/categories")
     public ResponseEntity<CommonResponse<List<CategoryResponse>>> getAllCategories(
-            @PathVariable Long boardId
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        List<CategoryResponse> response = categoryService.getAllCategories(boardId);
+        List<CategoryResponse> response = categoryService.getAllCategories(boardId, userDetails.getMember());
         return getResponseEntity("모든 카테고리 조회 완료", response);
     }
 
