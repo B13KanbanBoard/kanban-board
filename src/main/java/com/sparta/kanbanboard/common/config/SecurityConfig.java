@@ -76,7 +76,9 @@ public class SecurityConfig {
                 .requestMatchers("/").permitAll()// 메인 페이지 요청 허가
                 .requestMatchers("/api/members/login-page").permitAll() // 로그인 페이지
                 .requestMatchers("/api/members/signup").permitAll() // 회원 가입 페이지
-                .requestMatchers(HttpMethod.POST,"/api/members/signup2").permitAll() // 로그인 페이지 form data 형식
+                .requestMatchers("/api/members/myInfo").permitAll() // 내 정보 페이지
+            .requestMatchers(HttpMethod.POST,"/api/members/signup2").permitAll() // 로그인 페이지 form data 형식
+            
                 .anyRequest().authenticated()
         );
 

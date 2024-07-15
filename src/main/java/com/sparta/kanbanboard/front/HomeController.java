@@ -43,6 +43,12 @@ public class HomeController {
         return "signup";
     }
 
+    //내 정보 페이지
+    @GetMapping("/api/members/myInfo")
+    public String myInfoPage() {
+        return "myInfo";
+    }
+
     /**
      * 폼 데이터 형식  현재 비활성
      */
