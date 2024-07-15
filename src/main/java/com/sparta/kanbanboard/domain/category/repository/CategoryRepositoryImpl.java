@@ -21,6 +21,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 
         QCategory category = QCategory.category;
 
+        // same orderSpecifier is created everytime, -> GC automatically deletes after uses
         OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, category.orderNumber);
 
         return jpaQueryFactory.selectFrom(category)

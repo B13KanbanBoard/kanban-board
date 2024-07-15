@@ -52,7 +52,6 @@ public class CategoryService {
     /**
      * 전체 카테고리 조회
      */
-    @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories(Long boardId){
         return categoryRepository.getCategoryListSortOrderNumber(boardId)
                 .stream()
@@ -73,11 +72,9 @@ public class CategoryService {
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         checkMemberAuthToCategory(member, tempCategory);
-        checkBoardAndCategoryRelation(boardId, categoryId);
-
+        tempCategory.checkBoardAndCategoryRelation(boardId);
 
         String newName = request.getName();
-
         tempCategory.updateName(newName);
 
         return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
@@ -91,14 +88,11 @@ public class CategoryService {
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         checkMemberAuthToCategory(member, tempCategory);
-        checkBoardAndCategoryRelation(boardId, categoryId);
+        tempCategory.checkBoardAndCategoryRelation(boardId);
 
         Long newOrderNumber = request.getOrderNumber();
 
-        if(newOrderNumber != null){
-            checkCategoryOrderNumberDuplicate(boardId, newOrderNumber);
-            tempCategory.updateOrderNumber(newOrderNumber);
-        }
+        tempCategory.updateOrderNumber(newOrderNumber);
 
         return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
     }
@@ -111,7 +105,7 @@ public class CategoryService {
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         checkMemberAuthToCategory(member, tempCategory);
-        checkBoardAndCategoryRelation(boardId, categoryId);
+        tempCategory.checkBoardAndCategoryRelation(boardId);
 
         categoryRepository.delete(tempCategory);
     }
@@ -134,21 +128,6 @@ public class CategoryService {
         if( (!Objects.equals(category.getMember().getId(), member.getId())) && (!member.getRole().equals(MemberRole.ADMIN)) ){
             // 멤버롤 대신 멤버보드에서 롤이 생성자가 맞는지 확인하는 로직으로 변경 필요
             throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
-        }
-    }
-
-    /**
-     * orderNumber가 이미 존재하는지 중복 확인
-     */
-    public void checkCategoryOrderNumberDuplicate(Long boardId, Long orderNumber) {
-         Board board = boardRepository.findById(boardId).orElseThrow(
-                 () -> new BoardNotFoundException(BOARD_NOT_FOUND));
-         List<Category> categories = board.getCategoryList();
-
-        for (Category category : categories) {
-            if (Objects.equals(category.getOrderNumber(), orderNumber)) {
-                throw new OrderNumberDuplicatedException(DUPLICATED_ORDER_NUMBER);
-            }
         }
     }
 

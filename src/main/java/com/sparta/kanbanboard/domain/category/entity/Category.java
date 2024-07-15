@@ -1,9 +1,7 @@
 package com.sparta.kanbanboard.domain.category.entity;
 
 import com.sparta.kanbanboard.common.base.entity.Timestamped;
-import com.sparta.kanbanboard.common.exception.customexception.BoardNotFoundException;
-import com.sparta.kanbanboard.common.exception.customexception.NameDuplicatedException;
-import com.sparta.kanbanboard.common.exception.customexception.OrderNumberDuplicatedException;
+import com.sparta.kanbanboard.common.exception.customexception.*;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.member.entity.Member;
@@ -13,12 +11,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.naming.NameNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.BOARD_NOT_FOUND;
-import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.DUPLICATED_ORDER_NUMBER;
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.BAD_REQUEST;
 
 @Entity
 @Getter
@@ -63,7 +62,8 @@ public class Category extends Timestamped {
     public void updateOrderNumber(Long orderNumber){
         if(orderNumber != null) {
             checkCategoryOrderNumberDuplicate(orderNumber);
-            this.orderNumber = orderNumber;}
+            this.orderNumber = orderNumber;
+        }
     }
 
     /**
@@ -89,6 +89,15 @@ public class Category extends Timestamped {
             if (Objects.equals(category.getName(), name)) {
                 throw new NameDuplicatedException(DUPLICATED_ORDER_NUMBER);
             }
+        }
+    }
+
+    /**
+     * 카테고리가 해당보드에 연관된것이 맞는지 확인
+     */
+    public void checkBoardAndCategoryRelation(Long boardId) {
+        if(!Objects.equals(this.getBoard().getId(), boardId)){
+            throw new PathMismatchException(BAD_REQUEST);
         }
     }
 }

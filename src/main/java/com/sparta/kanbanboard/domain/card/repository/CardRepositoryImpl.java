@@ -21,6 +21,7 @@ public class CardRepositoryImpl implements CardRepositoryCustom {
 
         QCard card = QCard.card;
 
+        // same orderSpecifier is created everytime, -> GC automatically deletes after uses
         OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, card.orderNumber);
 
         return jpaQueryFactory.selectFrom(card)

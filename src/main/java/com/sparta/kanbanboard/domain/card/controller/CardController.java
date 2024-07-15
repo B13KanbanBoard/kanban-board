@@ -24,14 +24,13 @@ public class CardController {
     /**
      * 카드 생성
      */
-    @PostMapping("/boards/{boardId}/categories/{categoryId}/cards")
+    @PostMapping("/categories/{categoryId}/cards")
     public ResponseEntity<CommonResponse<CardCreateResponse>> createCard(
-            @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @RequestBody CardCreateRequest req,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CardCreateResponse response = cardService.createCard(boardId, categoryId, req, userDetails.getMember());
+        CardCreateResponse response = cardService.createCard(categoryId, req, userDetails.getMember());
         return getResponseEntity("카드 생성 완료", response);
     }
 
@@ -40,11 +39,10 @@ public class CardController {
      */
     @GetMapping("/categories/{categoryId}/cards")
     public ResponseEntity<CommonResponse<List<CardResponse>>> getAllCards(
-            @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        List<CardResponse> response = cardService.getAllCards(boardId, categoryId, userDetails.getMember());
+        List<CardResponse> response = cardService.getAllCards(categoryId, userDetails.getMember());
         return getResponseEntity("카드 전체 조회 완료", response);
     }
 
@@ -53,56 +51,52 @@ public class CardController {
      */
     @GetMapping("categories/{categoryId}/cards/{cardId}")
     public ResponseEntity<CommonResponse<CardResponse>> getCard(
-            @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @PathVariable Long cardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CardResponse response = cardService.getCard(boardId, categoryId, cardId, userDetails.getMember());
+        CardResponse response = cardService.getCard(categoryId, cardId, userDetails.getMember());
         return getResponseEntity("카드 조회 완료", response);
     }
 
     /**
      * 카드 수정
      */
-    @PatchMapping("/boards/{boardId}/categories/{categoryId}/cards/{cardId}")
+    @PatchMapping("/categories/{categoryId}/cards/{cardId}")
     public ResponseEntity<CommonResponse<CardResponse>> updateCard(
-            @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @PathVariable Long cardId,
             @RequestBody CardUpdateRequest req,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CardResponse response = cardService.updateCard(boardId, categoryId, cardId, req, userDetails.getMember());
+        CardResponse response = cardService.updateCard(categoryId, cardId, req, userDetails.getMember());
         return getResponseEntity("카드 수정 완료", response);
     }
 
     /**
      * 카드 순서 수정
      */
-    @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}/update-order")
+    @PatchMapping("/categories/{categoryId}/cards/{cardId}/update-order")
     public ResponseEntity<CommonResponse<CardUpdateOrderResponse>> updateOrderNumberCard(
-            @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @PathVariable Long cardId,
             @RequestBody CardUpdateOrderRequest req,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CardUpdateOrderResponse response = cardService.updateOrderNumberCard(boardId, categoryId, cardId, req, userDetails.getMember());
+        CardUpdateOrderResponse response = cardService.updateOrderNumberCard(categoryId, cardId, req, userDetails.getMember());
         return getResponseEntity("카드 순서 수정 완료", response);
     }
 
     /**
      * 카드 삭제
      */
-    @DeleteMapping("/{boardId}/categories/{categoryId}/cards/{cardId}")
+    @DeleteMapping("/categories/{categoryId}/cards/{cardId}")
     public ResponseEntity<CommonResponse<Long>> deleteCard(
-            @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @PathVariable Long cardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        cardService.deleteCard(boardId, categoryId, cardId, userDetails.getMember());
+        cardService.deleteCard(categoryId, cardId, userDetails.getMember());
         return getResponseEntity("카드 삭제 완료", cardId);
     }
 }

@@ -35,8 +35,7 @@ public class CardService {
      * 카드 생성
      */
     @Transactional
-    public CardCreateResponse createCard(Long boardId, Long categoryId, CardCreateRequest req, Member member) {
-        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+    public CardCreateResponse createCard(Long categoryId, CardCreateRequest req, Member member) {
 
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
@@ -52,9 +51,7 @@ public class CardService {
     /**
      * 카드 전체 조회
      */
-    @Transactional(readOnly = true)
-    public List<CardResponse> getAllCards(Long boardId, Long categoryId) {
-        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+    public List<CardResponse> getAllCards(Long categoryId, Member member) {
 
         return cardRepository.getCardListSortOrderNumber(categoryId)
                 .stream()
@@ -74,11 +71,10 @@ public class CardService {
     /**
      * 카드 조회
      */
-    public CardResponse getCard(Long boardId, Long categoryId, Long cardId) {
-        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+    public CardResponse getCard(Long categoryId, Long cardId, Member member) {
         Card tempCard = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(CARD_NOT_FOUND));
-        checkCategoryAndCardRelation(categoryId, tempCard);
+        tempCard.checkCategoryAndCardRelation(categoryId);
 
         return new CardResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getAssignee(), tempCard.getDescription(),
                 tempCard.getStartDate(), tempCard.getEndDate(), tempCard.getOrderNumber());
@@ -88,11 +84,10 @@ public class CardService {
      * 카드 수정
      */
     @Transactional
-    public CardResponse updateCard(Long boardId, Long categoryId, Long cardId, CardUpdateRequest req, Member member) {
-        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+    public CardResponse updateCard(Long categoryId, Long cardId, CardUpdateRequest req, Member member) {
         Card tempCard = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(CARD_NOT_FOUND));
-        checkCategoryAndCardRelation(categoryId, tempCard);
+        tempCard.checkCategoryAndCardRelation(categoryId);
         checkMemberAuthToCard(member, tempCard);
 
         String title = req.getTitle();
@@ -110,19 +105,16 @@ public class CardService {
     /**
      * 카드 orderNumber 수정
      */
-    public CardUpdateOrderResponse updateOrderNumberCard(Long boardId, Long categoryId, Long cardId, CardUpdateOrderRequest req, Member member) {
-        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+    @Transactional
+    public CardUpdateOrderResponse updateOrderNumberCard(Long categoryId, Long cardId,
+                                                         CardUpdateOrderRequest req, Member member) {
         Card tempCard = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(CARD_NOT_FOUND));
-        checkCategoryAndCardRelation(categoryId, tempCard);
+        tempCard.checkCategoryAndCardRelation(categoryId);
         checkMemberAuthToCard(member, tempCard);
 
         Long orderNum = req.getOrderNumber();
-
-        if(orderNum != null){
-            checkCardOrderNumberDuplicate(categoryId, orderNum);
-            tempCard.updateOrderNumber(orderNum);
-        }
+        tempCard.updateOrderNumber(orderNum);
 
         return new CardUpdateOrderResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getOrderNumber());
     }
@@ -131,22 +123,12 @@ public class CardService {
      * 카드 삭제
      */
     @Transactional
-    public void deleteCard(Long boardId, Long categoryId, Long cardId, Member member) {
-        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
+    public void deleteCard(Long categoryId, Long cardId, Member member) {
         Card tempCard = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(CARD_NOT_FOUND));
-        checkCategoryAndCardRelation(categoryId, tempCard);
+        tempCard.checkCategoryAndCardRelation(categoryId);
         checkMemberAuthToCard(member, tempCard);
         cardRepository.delete(tempCard);
-    }
-
-    /**
-     * 카테고리, 카드 연관 확인
-     */
-    public void checkCategoryAndCardRelation(Long categoryId, Card card) {
-        if(!Objects.equals(card.getCategory().getId(), categoryId)){
-            throw new PathMismatchException(BAD_REQUEST);
-        }
     }
 
     /**
@@ -158,20 +140,4 @@ public class CardService {
             throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
         }
     }
-
-    /**
-     * orderNumber가 이미 존재하는지 중복 확인
-     */
-    public void checkCardOrderNumberDuplicate(Long categoryId, Long orderNumber) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
-        List<Card> cards = category.getCardList();
-
-        for (Card card : cards) {
-            if (Objects.equals(card.getOrderNumber(), orderNumber)) {
-                throw new OrderNumberDuplicatedException(DUPLICATED_ORDER_NUMBER);
-            }
-        }
-    }
-
 }
