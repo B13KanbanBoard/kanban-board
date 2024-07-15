@@ -3,7 +3,10 @@ package com.sparta.kanbanboard.domain.category.controller;
 
 import com.sparta.kanbanboard.common.base.dto.CommonResponse;
 import com.sparta.kanbanboard.common.security.UserDetailsImpl;
-import com.sparta.kanbanboard.domain.category.dto.*;
+import com.sparta.kanbanboard.domain.category.dto.CategoryCreateRequest;
+import com.sparta.kanbanboard.domain.category.dto.CategoryResponse;
+import com.sparta.kanbanboard.domain.category.dto.CategoryUpdateOrderRequest;
+import com.sparta.kanbanboard.domain.category.dto.CategoryUpdateRequest;
 import com.sparta.kanbanboard.domain.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

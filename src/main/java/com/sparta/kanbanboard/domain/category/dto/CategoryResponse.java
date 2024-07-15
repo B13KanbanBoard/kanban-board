@@ -1,7 +1,5 @@
 package com.sparta.kanbanboard.domain.category.dto;
 
-import com.sparta.kanbanboard.domain.card.dto.CardResponse;
-import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import lombok.Builder;
 import lombok.Getter;

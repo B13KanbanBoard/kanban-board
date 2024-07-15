@@ -1,10 +1,15 @@
 package com.sparta.kanbanboard.domain.category.service;
 
 
-import com.sparta.kanbanboard.common.exception.customexception.*;
+import com.sparta.kanbanboard.common.exception.customexception.BoardNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.CategoryNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.MemberAccessDeniedException;
+import com.sparta.kanbanboard.common.exception.customexception.PathMismatchException;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
-import com.sparta.kanbanboard.domain.category.dto.*;
+import com.sparta.kanbanboard.domain.category.dto.CategoryResponse;
+import com.sparta.kanbanboard.domain.category.dto.CategoryUpdateOrderRequest;
+import com.sparta.kanbanboard.domain.category.dto.CategoryUpdateRequest;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.category.repository.CategoryRepository;
 import com.sparta.kanbanboard.domain.member.entity.Member;

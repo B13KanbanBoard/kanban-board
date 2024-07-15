@@ -1,7 +1,9 @@
 package com.sparta.kanbanboard.domain.category.entity;
 
 import com.sparta.kanbanboard.common.base.entity.Timestamped;
-import com.sparta.kanbanboard.common.exception.customexception.*;
+import com.sparta.kanbanboard.common.exception.customexception.NameDuplicatedException;
+import com.sparta.kanbanboard.common.exception.customexception.OrderNumberDuplicatedException;
+import com.sparta.kanbanboard.common.exception.customexception.PathMismatchException;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.member.entity.Member;
@@ -11,13 +13,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.naming.NameNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
 import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.BAD_REQUEST;
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.DUPLICATED_ORDER_NUMBER;
 
 @Entity
 @Getter

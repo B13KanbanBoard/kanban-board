@@ -1,13 +1,13 @@
 package com.sparta.kanbanboard.domain.card.service;
 
-import com.sparta.kanbanboard.common.exception.customexception.*;
+import com.sparta.kanbanboard.common.exception.customexception.CardNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.CategoryNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.MemberAccessDeniedException;
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.card.repository.CardRepository;
-import com.sparta.kanbanboard.domain.card.dto.CardUpdateRequest;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.category.repository.CategoryRepository;
-import com.sparta.kanbanboard.domain.category.service.CategoryService;
 import com.sparta.kanbanboard.domain.member.entity.Member;
 import com.sparta.kanbanboard.domain.member.entity.MemberRole;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
 
@@ -28,7 +27,6 @@ import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.
 public class CardService {
 
     private final CardRepository cardRepository;
-    private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
 
     /**

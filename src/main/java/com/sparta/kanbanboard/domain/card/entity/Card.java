@@ -1,7 +1,6 @@
 package com.sparta.kanbanboard.domain.card.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sparta.kanbanboard.common.exception.customexception.CategoryNotFoundException;
 import com.sparta.kanbanboard.common.exception.customexception.OrderNumberDuplicatedException;
 import com.sparta.kanbanboard.common.exception.customexception.PathMismatchException;
 import com.sparta.kanbanboard.domain.category.entity.Category;
@@ -17,7 +16,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.BAD_REQUEST;
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.DUPLICATED_ORDER_NUMBER;
 
 @Entity
 @Getter
