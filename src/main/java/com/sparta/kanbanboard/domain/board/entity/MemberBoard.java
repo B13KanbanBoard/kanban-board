@@ -1,5 +1,8 @@
 package com.sparta.kanbanboard.domain.board.entity;
 
+import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.INAPPROPRIATE_MEMBER_BOARD;
+
+import com.sparta.kanbanboard.common.exception.customexception.BoardInappropriateException;
 import com.sparta.kanbanboard.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,5 +56,14 @@ public class MemberBoard {
                 .board(board)
                 .boardRole(boardRole)
                 .build();
+    }
+
+    /**
+     * 로그인 유저의 Board 권한 체크
+     */
+    public void validBoardRole(){
+        if(BoardRole.PARTICIPANTS.equals(this.role)){
+            throw new BoardInappropriateException(INAPPROPRIATE_MEMBER_BOARD);
+        }
     }
 }
