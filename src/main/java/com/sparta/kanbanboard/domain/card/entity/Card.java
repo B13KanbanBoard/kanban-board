@@ -29,19 +29,14 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column(nullable = false)
     private String title;
 
     // member email 로 저장
-    @Column(nullable = false)
     private String assignee;
 
-    @Column(nullable = false)
     private String description;
 
-    @NotBlank
-    @Column(nullable = false)
     private Long orderNumber;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -79,8 +74,25 @@ public class Card {
         if(title != null) {this.title = title;}
         if(assignee != null) {this.assignee = assignee;}
         if(description != null) {this.description = description;}
-        if(startDate != null) {this.startDate = startDate;}
-        if(endDate != null) {this.endDate = endDate;}
+        if(endDate != null) {
+            if(startDate != null && endDate.isBefore(startDate)) {
+                throw new IllegalArgumentException("Start date cannot be after end date");
+            } else if(startDate == null && this.getStartDate() != null && endDate.isBefore(this.getStartDate())){
+                throw new IllegalArgumentException("Start date cannot be after end date");
+            }
+            this.endDate = endDate;
+        }
+        if(startDate != null) {
+            if ((endDate != null) && (startDate.isBefore(endDate) || startDate.isEqual(endDate))) {
+                this.startDate = startDate;
+            } else if ((this.getEndDate() != null) && (startDate.isBefore(this.getEndDate()) || startDate.isEqual(this.getEndDate()))) {
+                this.startDate = startDate;
+            } else if (endDate == null && this.getEndDate() == null) {
+                this.startDate = startDate;
+            } else {
+                throw new IllegalArgumentException("Start date cannot be after end date");
+            }
+        }
     }
 
     /**

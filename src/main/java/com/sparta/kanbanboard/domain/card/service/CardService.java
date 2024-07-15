@@ -47,8 +47,9 @@ public class CardService {
         }
 
         Long orderNum = (long) (tempCategory.getCardList().size() + 1);
-
         Card card = new Card(req.getTitle(), orderNum, tempCategory, member);
+        // 카드 순서 중복 확인
+        card.checkCardOrderNumberDuplicate(orderNum);
 
         cardRepository.save(card);
 

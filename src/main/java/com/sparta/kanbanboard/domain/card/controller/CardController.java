@@ -4,6 +4,7 @@ import com.sparta.kanbanboard.common.base.dto.CommonResponse;
 import com.sparta.kanbanboard.common.security.UserDetailsImpl;
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.service.CardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -65,7 +66,7 @@ public class CardController {
     public ResponseEntity<CommonResponse<CardResponse>> updateCard(
             @PathVariable Long categoryId,
             @PathVariable Long cardId,
-            @RequestBody CardUpdateRequest req,
+            @Valid @RequestBody CardUpdateRequest req,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
         CardResponse response = cardService.updateCard(categoryId, cardId, req, userDetails.getMember());
