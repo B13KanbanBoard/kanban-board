@@ -1,0 +1,48 @@
+### 카테고리 생성
+POST http://localhost:8080/api/boards/1/categories
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "name": "카테고리 제목1"
+}
+
+### 카드 생성
+POST http://localhost:8080/api/boards/1/categories/1/cards
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "카드 제목1",
+  "assignee": "작업자1",
+  "description": "상세 내용"
+}
+
+### 댓글 생성 (댓글 생성하기 전에   보드 -> 카테고리 -> 카드 생성 후에 하기)
+POST http://localhost:8080/api/cards/1/comments
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "content": "댓글 내용!!!!!"
+}
+
+
+### 댓글 조회
+GET http://localhost:8080/api/cards/1/comments
+Authorization:{{Authorization}}
+
+
+### 댓글 수정
+PATCH http://localhost:8080/api/cards/1/comments/1
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "content": "댓글 수정@@@@@"
+}
+
+
+### 댓글 삭제
+DELETE http://localhost:8080/api/cards/1/comments/1
+Authorization:{{Authorization}}
