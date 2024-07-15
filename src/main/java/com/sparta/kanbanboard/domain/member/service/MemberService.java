@@ -140,6 +140,7 @@ public class MemberService {
     /**
      * 회원 탈퇴
      */
+    @Transactional
     public String deleteMember(Long memberId, Member member) {
         if(!memberId.equals(member.getId())) {
             throw new MemberMismatchException(MISMATCH_USER);
