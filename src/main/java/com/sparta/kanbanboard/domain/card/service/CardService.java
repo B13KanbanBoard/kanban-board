@@ -53,19 +53,7 @@ public class CardService {
      */
     public List<CardResponse> getAllCards(Long categoryId, Member member) {
 
-        return cardRepository.getCardListSortOrderNumber(categoryId)
-                .stream()
-                .map(m ->
-                        CardResponse.builder()
-                                .cardId(m.getId())
-                                .title(m.getTitle())
-                                .assignee(m.getAssignee())
-                                .description(m.getDescription())
-                                .startDate(m.getStartDate())
-                                .endDate(m.getEndDate())
-                                .orderNumber(m.getOrderNumber())
-                                .build()
-                ).collect(Collectors.toList());
+        return cardRepository.getCardListSortOrderNumber(categoryId);
     }
 
     /**
