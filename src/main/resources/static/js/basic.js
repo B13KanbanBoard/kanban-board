@@ -263,7 +263,6 @@ function logout() {
 }
 
 function getToken() {
-
     let auth = Cookies.get('Authorization');
 
     if(auth === undefined) {
