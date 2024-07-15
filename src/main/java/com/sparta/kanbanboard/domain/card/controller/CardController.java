@@ -5,7 +5,6 @@ import com.sparta.kanbanboard.common.security.UserDetailsImpl;
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.service.CardService;
 import com.sparta.kanbanboard.domain.card.dto.CardUpdateRequest;
-import com.sparta.kanbanboard.domain.card.dto.CardUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +16,7 @@ import static com.sparta.kanbanboard.common.util.ControllerUtil.getResponseEntit
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/boards")
+@RequestMapping("/api")
 public class CardController {
 
     private final CardService cardService;
@@ -25,7 +24,7 @@ public class CardController {
     /**
      * 카드 생성
      */
-    @PostMapping("/{boardId}/categories/{categoryId}/cards")
+    @PostMapping("/boards/{boardId}/categories/{categoryId}/cards")
     public ResponseEntity<CommonResponse<CardCreateResponse>> createCard(
             @PathVariable Long boardId,
             @PathVariable Long categoryId,
@@ -39,58 +38,48 @@ public class CardController {
     /**
      * 카드 전체 조회
      */
-    @GetMapping("/{boardId}/categories/{categoryId}/cards")
+    @GetMapping("/categories/{categoryId}/cards")
     public ResponseEntity<CommonResponse<List<CardResponse>>> getAllCards(
             @PathVariable Long boardId,
-            @PathVariable Long categoryId
+            @PathVariable Long categoryId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        List<CardResponse> response = cardService.getAllCards(boardId, categoryId);
+        List<CardResponse> response = cardService.getAllCards(boardId, categoryId, userDetails.getMember());
         return getResponseEntity("카드 전체 조회 완료", response);
     }
 
     /**
      * 특정 카드 조회
      */
-    @GetMapping("/{boardId}/categories/{categoryId}/cards/{cardId}")
+    @GetMapping("categories/{categoryId}/cards/{cardId}")
     public ResponseEntity<CommonResponse<CardResponse>> getCard(
             @PathVariable Long boardId,
             @PathVariable Long categoryId,
-            @PathVariable Long cardId
+            @PathVariable Long cardId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CardResponse response = cardService.getCard(boardId, categoryId, cardId);
+        CardResponse response = cardService.getCard(boardId, categoryId, cardId, userDetails.getMember());
         return getResponseEntity("카드 조회 완료", response);
     }
 
     /**
      * 카드 수정
      */
-    @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}")
-    public ResponseEntity<CommonResponse<CardUpdateResponse>> updateCard(
+    @PatchMapping("/boards/{boardId}/categories/{categoryId}/cards/{cardId}")
+    public ResponseEntity<CommonResponse<CardResponse>> updateCard(
             @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @PathVariable Long cardId,
             @RequestBody CardUpdateRequest req,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CardUpdateResponse response = cardService.updateCard(boardId, categoryId, cardId, req, userDetails.getMember());
+        CardResponse response = cardService.updateCard(boardId, categoryId, cardId, req, userDetails.getMember());
         return getResponseEntity("카드 수정 완료", response);
     }
 
     /**
-     * 시작일자, 마감일자 설정 :
+     * 카드 순서 수정
      */
-    @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}/update-date")
-    public ResponseEntity<CommonResponse<CardUpdateDateResponse>> updateDateCard(
-            @PathVariable Long boardId,
-            @PathVariable Long categoryId,
-            @PathVariable Long cardId,
-            @RequestBody CardUpdateDateRequest req,
-            @AuthenticationPrincipal UserDetailsImpl userDetails
-    ){
-        CardUpdateDateResponse response = cardService.updateDateCard(boardId, categoryId, cardId, req, userDetails.getMember());
-        return getResponseEntity("시작/마감 일자 수정 완료", response);
-    }
-
     @PatchMapping("/{boardId}/categories/{categoryId}/cards/{cardId}/update-order")
     public ResponseEntity<CommonResponse<CardUpdateOrderResponse>> updateOrderNumberCard(
             @PathVariable Long boardId,

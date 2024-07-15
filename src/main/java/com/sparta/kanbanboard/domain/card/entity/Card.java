@@ -34,7 +34,7 @@ public class Card {
     private String description;
 
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Long orderNumber;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -60,28 +60,18 @@ public class Card {
         this.member = member;
     }
 
-    public void updateStartDate(LocalDate startDate){
-        this.startDate = startDate;
-    }
-
-    public void updateEndDate(LocalDate endDate){
-        this.endDate = endDate;
-    }
-
-    public void updateTitle(String title){
-        this.title = title;
-    }
-
-    public void updateDescription(String description){
-        this.description = description;
-    }
-
-    public void updateAssignee(String assignee){
-        this.assignee = assignee;
-    }
 
     public void updateOrderNumber(Long orderNumber){
         this.orderNumber = orderNumber;
     }
+
+    public void updateCard(String title, String assignee, String description, LocalDate startDate, LocalDate endDate){
+        if(title != null) {this.title = title;}
+        if(assignee != null) {this.assignee = assignee;}
+        if(description != null) {this.description = description;}
+        if(startDate != null) {this.startDate = startDate;}
+        if(endDate != null) {this.endDate = endDate;}
+    }
+
 
 }

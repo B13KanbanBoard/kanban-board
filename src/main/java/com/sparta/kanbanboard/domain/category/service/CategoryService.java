@@ -32,7 +32,7 @@ public class CategoryService {
      * 카테고리 생성
      */
     @Transactional
-    public CategoryCreateResponse createCategory(Long boardId, String name, Member member) {
+    public CategoryResponse createCategory(Long boardId, String name, Member member) {
         // 멤버가 매니저 역할인지 확인하는 메서드 추가하기
 
         Board tempBoard = boardRepository.findById(boardId).orElseThrow(
@@ -41,9 +41,12 @@ public class CategoryService {
 
         Category category = new Category(name, orderNum, member, tempBoard);
 
+        // 이름 중복 확인
+        category.checkCategoryNameDuplicate(name);
+
         categoryRepository.save(category);
 
-        return new CategoryCreateResponse(category.getId(), category.getName(), category.getOrderNumber());
+        return new CategoryResponse(category.getId(), category.getName(), category.getOrderNumber());
     }
 
     /**
@@ -75,9 +78,7 @@ public class CategoryService {
 
         String newName = request.getName();
 
-        if(newName != null){
-            tempCategory.updateName(newName);
-        }
+        tempCategory.updateName(newName);
 
         return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
     }
@@ -86,7 +87,7 @@ public class CategoryService {
      * order number 수정
      */
     @Transactional
-    public CategoryUpdateOrderResponse updateOrderNumberCategory(Long boardId, Long categoryId, CategoryUpdateOrderRequest request, Member member) {
+    public CategoryResponse updateOrderNumberCategory(Long boardId, Long categoryId, CategoryUpdateOrderRequest request, Member member) {
         Category tempCategory = categoryRepository.findById(categoryId).orElseThrow(
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         checkMemberAuthToCategory(member, tempCategory);
@@ -99,7 +100,7 @@ public class CategoryService {
             tempCategory.updateOrderNumber(newOrderNumber);
         }
 
-        return new CategoryUpdateOrderResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
+        return new CategoryResponse(tempCategory.getId(), tempCategory.getName(), tempCategory.getOrderNumber());
     }
 
     /**

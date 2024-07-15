@@ -1,12 +1,10 @@
 package com.sparta.kanbanboard.domain.card.service;
 
 import com.sparta.kanbanboard.common.exception.customexception.*;
-import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.card.dto.*;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.card.repository.CardRepository;
 import com.sparta.kanbanboard.domain.card.dto.CardUpdateRequest;
-import com.sparta.kanbanboard.domain.card.dto.CardUpdateResponse;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.category.repository.CategoryRepository;
 import com.sparta.kanbanboard.domain.category.service.CategoryService;
@@ -68,6 +66,7 @@ public class CardService {
                                 .description(m.getDescription())
                                 .startDate(m.getStartDate())
                                 .endDate(m.getEndDate())
+                                .orderNumber(m.getOrderNumber())
                                 .build()
                 ).collect(Collectors.toList());
     }
@@ -82,37 +81,14 @@ public class CardService {
         checkCategoryAndCardRelation(categoryId, tempCard);
 
         return new CardResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getAssignee(), tempCard.getDescription(),
-                tempCard.getStartDate(), tempCard.getEndDate());
-    }
-
-    /**
-     * 카드 시작/마감일자 수정
-     */
-    @Transactional
-    public CardUpdateDateResponse updateDateCard(Long boardId, Long categoryId, Long cardId, CardUpdateDateRequest req, Member member) {
-        categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
-        Card tempCard = cardRepository.findById(cardId).orElseThrow(
-                () -> new CardNotFoundException(CARD_NOT_FOUND));
-        checkCategoryAndCardRelation(categoryId, tempCard);
-        checkMemberAuthToCard(member, tempCard);
-        LocalDate startDate = req.getStartDate();
-        LocalDate endDate = req.getEndDate();
-
-        if(startDate != null){
-            tempCard.updateStartDate(startDate);
-        }
-        if(endDate != null){
-            tempCard.updateEndDate(endDate);
-        }
-
-        return new CardUpdateDateResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getStartDate(), tempCard.getEndDate());
+                tempCard.getStartDate(), tempCard.getEndDate(), tempCard.getOrderNumber());
     }
 
     /**
      * 카드 수정
      */
     @Transactional
-    public CardUpdateResponse updateCard(Long boardId, Long categoryId, Long cardId, CardUpdateRequest req, Member member) {
+    public CardResponse updateCard(Long boardId, Long categoryId, Long cardId, CardUpdateRequest req, Member member) {
         categoryService.checkBoardAndCategoryRelation(boardId, categoryId);
         Card tempCard = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(CARD_NOT_FOUND));
@@ -122,19 +98,13 @@ public class CardService {
         String title = req.getTitle();
         String assignee = req.getAssignee();
         String description = req.getDescription();
+        LocalDate startDate = req.getStartDate();
+        LocalDate endDate = req.getEndDate();
 
-        if(title != null){
-            tempCard.updateTitle(title);
-        }
-        if(assignee != null){
-            tempCard.updateAssignee(assignee);
-        }
-        if(description != null){
-            tempCard.updateDescription(description);
-        }
+        tempCard.updateCard(title, assignee, description, startDate, endDate);
 
-        return new CardUpdateResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getAssignee(),
-                tempCard.getDescription(), tempCard.getOrderNumber());
+        return new CardResponse(tempCard.getId(), tempCard.getTitle(), tempCard.getAssignee(),
+                tempCard.getDescription(), tempCard.getStartDate(), tempCard.getEndDate(), tempCard.getOrderNumber());
     }
 
     /**

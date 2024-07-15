@@ -1,6 +1,9 @@
 package com.sparta.kanbanboard.domain.category.entity;
 
 import com.sparta.kanbanboard.common.base.entity.Timestamped;
+import com.sparta.kanbanboard.common.exception.customexception.BoardNotFoundException;
+import com.sparta.kanbanboard.common.exception.customexception.NameDuplicatedException;
+import com.sparta.kanbanboard.common.exception.customexception.OrderNumberDuplicatedException;
 import com.sparta.kanbanboard.domain.board.entity.Board;
 import com.sparta.kanbanboard.domain.card.entity.Card;
 import com.sparta.kanbanboard.domain.member.entity.Member;
@@ -12,6 +15,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.BOARD_NOT_FOUND;
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.DUPLICATED_ORDER_NUMBER;
 
 @Entity
 @Getter
@@ -24,7 +31,7 @@ public class Category extends Timestamped {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Long orderNumber;
 
     @NotBlank
@@ -39,7 +46,7 @@ public class Category extends Timestamped {
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cardList = new ArrayList<>();
 
     public Category(String name, Long orderNumber, Member member, Board board){
@@ -50,11 +57,38 @@ public class Category extends Timestamped {
     }
 
     public void updateName(String name){
-        this.name = name;
+        if(name != null) {this.name = name;}
     }
 
     public void updateOrderNumber(Long orderNumber){
-        this.orderNumber = orderNumber;
+        if(orderNumber != null) {
+            checkCategoryOrderNumberDuplicate(orderNumber);
+            this.orderNumber = orderNumber;}
     }
 
+    /**
+     * 해당 카테고리에서 Order number 중복 확인
+     */
+    public void checkCategoryOrderNumberDuplicate(Long orderNumber) {
+        List<Category> categories = this.getBoard().getCategoryList();
+
+        for (Category category : categories) {
+            if (Objects.equals(category.getOrderNumber(), orderNumber)) {
+                throw new OrderNumberDuplicatedException(DUPLICATED_ORDER_NUMBER);
+            }
+        }
+    }
+
+    /**
+     * 해당 카테고리에서 name 중복 확인
+     */
+    public void checkCategoryNameDuplicate(String name) {
+        List<Category> categories = this.getBoard().getCategoryList();
+
+        for (Category category : categories) {
+            if (Objects.equals(category.getName(), name)) {
+                throw new NameDuplicatedException(DUPLICATED_ORDER_NUMBER);
+            }
+        }
+    }
 }

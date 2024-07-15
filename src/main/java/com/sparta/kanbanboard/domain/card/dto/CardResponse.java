@@ -13,14 +13,17 @@ public class CardResponse {
     private final String description;
     private final LocalDate startDate;
     private final LocalDate endDate;
+    private final Long orderNumber;
 
     @Builder
-    public CardResponse(Long cardId, String title, String assignee, String description, LocalDate startDate, LocalDate endDate) {
+    public CardResponse(Long cardId, String title, String assignee, String description,
+                        LocalDate startDate, LocalDate endDate, Long orderNumber) {
         this.cardId = cardId;
         this.title = title;
         this.assignee = assignee;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.orderNumber = orderNumber;
     }
 }

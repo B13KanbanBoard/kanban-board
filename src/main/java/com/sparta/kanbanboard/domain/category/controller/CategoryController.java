@@ -25,12 +25,12 @@ public class CategoryController {
      * 카테고리 생성
      */
     @PostMapping("/{boardId}/categories")
-    public ResponseEntity<CommonResponse<CategoryCreateResponse>> createCategory(
+    public ResponseEntity<CommonResponse<CategoryResponse>> createCategory(
             @PathVariable Long boardId,
             @RequestBody CategoryCreateRequest req,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CategoryCreateResponse response = categoryService.createCategory(boardId, req.getName(), userDetails.getMember());
+        CategoryResponse response = categoryService.createCategory(boardId, req.getName(), userDetails.getMember());
         return getResponseEntity("카테고리 생성 완료", response);
     }
 
@@ -63,13 +63,13 @@ public class CategoryController {
      * 카테고리 순서 수정
      */
     @PatchMapping("/{boardId}/categories/{categoryId}/update-order")
-    public ResponseEntity<CommonResponse<CategoryUpdateOrderResponse>> updateOrderNumberCategory(
+    public ResponseEntity<CommonResponse<CategoryResponse>> updateOrderNumberCategory(
             @PathVariable Long boardId,
             @PathVariable Long categoryId,
             @RequestBody CategoryUpdateOrderRequest req,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ){
-        CategoryUpdateOrderResponse response = categoryService.updateOrderNumberCategory(boardId, categoryId, req, userDetails.getMember());
+        CategoryResponse response = categoryService.updateOrderNumberCategory(boardId, categoryId, req, userDetails.getMember());
         return getResponseEntity("카테고리 수정 완료", response);
     }
 
