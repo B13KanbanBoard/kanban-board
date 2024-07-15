@@ -11,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -42,6 +39,10 @@ public class HomeController {
     public String signupPage() {
         return "signup";
     }
+
+    // 선택한 보드 페이지 (카테코리 및 카드 나열)
+    @GetMapping("/api/boards/1")
+    public String membersPage() { return "board"; }
 
     //내 정보 페이지
     @GetMapping("/api/members/myInfo")
