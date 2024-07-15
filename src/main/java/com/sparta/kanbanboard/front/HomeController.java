@@ -43,6 +43,10 @@ public class HomeController {
         return "signup";
     }
 
+    // 선택한 보드 페이지 (카테코리 및 카드 나열)
+    @GetMapping("/api/boards/1")
+    public String membersPage() { return "board"; }
+
     /**
      * 폼 데이터 형식  현재 비활성
      */
