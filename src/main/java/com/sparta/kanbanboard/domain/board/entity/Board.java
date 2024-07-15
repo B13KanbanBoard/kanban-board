@@ -33,7 +33,7 @@ public class Board extends Timestamped {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberBoard> memberBoardList = new ArrayList<>();
-  
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categoryList = new ArrayList<>();
 
