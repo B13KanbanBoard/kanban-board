@@ -134,7 +134,7 @@
                     jqXHR.setRequestHeader('Authorization', token);
                 });
 
-                window.location.href = host + '/api/members/login-page'
+                window.location.href = host + '/members/login-page'
             })
             .fail(function (jqXHR, textStatus) {
                 var response = JSON.parse(jqXHR.responseText);

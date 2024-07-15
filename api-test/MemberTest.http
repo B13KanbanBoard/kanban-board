@@ -11,14 +11,18 @@
 @password3 = Abcdefg123!
 @name3 = 홍길동3
 
+@email4 = test4@gmail.com
+@password4 = Abcdefg123!
+@name4 = 홍길동4
+
 ### 회원가입
 POST http://localhost:8080/api/members/signup
 Content-Type: application/json
 
 {
-  "email" : "{{email1}}",
-  "password" : "{{password1}}",
-  "name" : "{{name1}}"
+  "email" : "{{email4}}",
+  "password" : "{{password4}}",
+  "name" : "{{name4}}"
 }
 
 ### 로그인
@@ -74,5 +78,5 @@ Content-Type: application/json
 
 
 ### 회원 탈퇴
-DELETE http://localhost:8080/api/members/3
+DELETE http://localhost:8080/api/members/1
 Authorization: {{Authorization}}
