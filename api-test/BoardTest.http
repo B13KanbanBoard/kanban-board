@@ -4,8 +4,8 @@ Authorization:{{Authorization}}
 Content-Type: application/json
 
 {
-  "boardName": "board5",
-  "content": "5번 보드"
+  "boardName": "board1",
+  "content": "1번 보드"
 }
 
 

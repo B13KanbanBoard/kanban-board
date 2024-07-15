@@ -15,6 +15,11 @@ import com.sparta.kanbanboard.common.exception.customexception.MemberNotFoundExc
 import com.sparta.kanbanboard.common.exception.customexception.MemberPasswordNotMatchesException;
 import com.sparta.kanbanboard.common.exception.customexception.ReissueTokenFailException;
 import com.sparta.kanbanboard.common.security.jwt.JwtProvider;
+import com.sparta.kanbanboard.domain.board.entity.Board;
+import com.sparta.kanbanboard.domain.board.entity.BoardRole;
+import com.sparta.kanbanboard.domain.board.entity.MemberBoard;
+import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
+import com.sparta.kanbanboard.domain.board.repository.MemberBoardRepository;
 import com.sparta.kanbanboard.domain.member.dto.ProfileResponse;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
 import com.sparta.kanbanboard.domain.member.dto.SignupResponse;
@@ -25,6 +30,8 @@ import com.sparta.kanbanboard.domain.member.entity.MemberRole;
 import com.sparta.kanbanboard.domain.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,17 +45,10 @@ import org.springframework.util.StringUtils;
 public class MemberService {
 
     private final JwtProvider jwtProvider;
-    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-
-    /**
-     * 이메일 중복확인
-     */
-    private void validEmail(String email) {
-        if(memberRepository.findByEmail(email).isPresent()){
-            throw new MemberDuplicationException(DUPLICATED_USER);
-        }
-    }
+    private final MemberRepository memberRepository;
+    private final MemberBoardRepository memberBoardRepository;
+    private final BoardRepository boardRepository;
 
     /**
      * 회원가입
@@ -144,11 +144,24 @@ public class MemberService {
         if(!memberId.equals(member.getId())) {
             throw new MemberMismatchException(MISMATCH_USER);
         }
+
+        List<MemberBoard> memberBoardList = memberBoardRepository.findByMemberIdAndRole(member.getId(), BoardRole.MANAGER);
+        List<Board> boardList = new ArrayList<>();
+        for(MemberBoard memberBoard : memberBoardList) {
+            boardRepository.findById(memberBoard.getBoard().getId()).ifPresent(boardList::add);
+        }
+        boardRepository.deleteAll(boardList);
         memberRepository.delete(member);
-        //해당 Board 삭제
-        //해당 Category 삭제
-        //해당 Card 삭제
-        //해당 Comment 삭제
+
         return member.getEmail();
+    }
+
+    /**
+     * 이메일 중복확인
+     */
+    private void validEmail(String email) {
+        if(memberRepository.findByEmail(email).isPresent()){
+            throw new MemberDuplicationException(DUPLICATED_USER);
+        }
     }
 }

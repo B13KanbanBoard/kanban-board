@@ -2,7 +2,6 @@ package com.sparta.kanbanboard.domain.board.service;
 
 import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.CANNOT_DELETE_SELF;
 import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.CANNOT_INVITE_SELF;
-import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.INAPPROPRIATE_MEMBER_BOARD;
 import static com.sparta.kanbanboard.common.exception.errorCode.BoardErrorCode.NOT_FOUND_BOARD;
 import static com.sparta.kanbanboard.common.exception.errorCode.MemberErrorCode.NOT_FOUND_USER;
 
@@ -58,7 +57,6 @@ public class BoardService {
     /**
      * Board page 조회
      */
-    @Transactional(readOnly = true)
     public PageBoardResponse getBoards (Integer pageNum, Integer size, Member loginMember) {
         Pageable pageable = PageRequest.of(pageNum-1, size, Sort.by(Direction.DESC, "createdAt"));
         Page<Board> boardPage = boardRepository.searchMyBoards(loginMember.getId(), pageable);
@@ -69,7 +67,6 @@ public class BoardService {
     /**
      * Board 상세 조회
      */
-    @Transactional(readOnly = true)
     public List<BoardDetailResponse> getBoardDetails (Long boardId) {
         return boardRepository.searchBoardDetails(boardId);
     }
@@ -108,13 +105,14 @@ public class BoardService {
         Board board = findById(request.getBoardId());
         checkMemberAboutBoard(request.getBoardId(), loginMember.getId());
 
+        //자기 자신을 초대 예외처리
         boolean isSelfInvite = request.getMemberIdList().stream()
                         .anyMatch(inviteMemberId -> inviteMemberId.equals(loginMember.getId()));
-
         if (isSelfInvite) {
             throw new BoardInappropriateException(CANNOT_INVITE_SELF);
         }
 
+        //초대하려는 사용자가 없을 경우 예외처리
         List<Member> inviteMemberList = memberRepository.findByIdIn(request.getMemberIdList());
         if(inviteMemberList.isEmpty()){
             throw new MemberNotFoundException(NOT_FOUND_USER);
@@ -132,18 +130,19 @@ public class BoardService {
      */
     @Transactional
     public String deleteBoardMember(Long boardId, Long memberId, Member loginMember) {
+        //로그인 유저와 삭제할 유저 비교
+        if(memberId.equals(loginMember.getId())){
+            throw new BoardInappropriateException(CANNOT_DELETE_SELF);
+        }
+
         Board board = findById(boardId);
         checkMemberAboutBoard(boardId, loginMember.getId());
 
+        //삭제할 사용자의 memberBoard 조회
         MemberBoard memberBoard = memberBoardRepository.findByBoardIdAndMemberId(boardId, memberId)
                 .orElseThrow(
                         () -> new BoardNotFoundException(NOT_FOUND_BOARD)
                 );
-
-        if(loginMember.getId().equals(memberBoard.getMember().getId())){
-            throw new BoardInappropriateException(CANNOT_DELETE_SELF);
-        }
-
         board.getMemberBoardList().remove(memberBoard);
 
         return memberBoard.getMember().getEmail();
@@ -159,16 +158,14 @@ public class BoardService {
     }
 
     /**
-     * MemberBoard 존재 확인 및 권한 확인
+     * 로그인한 유저의 MemberBoard 존재 확인 및 권한 확인
      */
     private void checkMemberAboutBoard(Long boardId, Long memberId) {
         MemberBoard memberBoard = memberBoardRepository.findByBoardIdAndMemberId(boardId, memberId).orElseThrow(
                 () -> new BoardNotFoundException(NOT_FOUND_BOARD)
         );
 
-        if(BoardRole.PARTICIPANTS.equals(memberBoard.getRole())){
-            throw new BoardInappropriateException(INAPPROPRIATE_MEMBER_BOARD);
-        }
+        memberBoard.validBoardRole();
     }
 
 }
