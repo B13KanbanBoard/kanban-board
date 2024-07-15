@@ -8,11 +8,12 @@ import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 @Builder
-public record PageBoardResponse(Integer currentPage, Long totalCount,
+public record PageBoardResponse(Integer totalPage, Integer currentPage, Long totalCount,
                                 List<BoardResponse> boardResponseList) {
 
-    public static PageBoardResponse of(Integer currentPage, Long totalCount, Page<Board> boards) {
+    public static PageBoardResponse of(Integer totalPage, Integer currentPage, Long totalCount, Page<Board> boards) {
         return PageBoardResponse.builder()
+                .totalPage(totalPage)
                 .currentPage(currentPage)
                 .totalCount(totalCount)
                 .boardResponseList(boards.getContent().stream().map(BoardResponse::of).toList())

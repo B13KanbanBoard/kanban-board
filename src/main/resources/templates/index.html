@@ -10,6 +10,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- js-cookie -->
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <!-- jQeury Pagination -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.2/jquery.twbsPagination.min.js"></script>
+
 
     <script src="/js/basic.js"></script>
     <title>메인 페이지</title>
@@ -42,6 +45,13 @@
         .list-group-item-action:hover {
             background-color: #f8f9fa;
         }
+        .paging-div {
+            padding: 15px 0 5px 10px;
+            display: table;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -58,53 +68,53 @@
     </a>
 </div>
 
-<div class="card shadow">
+<div class="card shadow mb-4">
     <div class="card-header bg-primary text-white">
-        Featured
+        Board List
     </div>
     <div class="card-body">
+        <ul class="list-group mt-2">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBoardModal" data-bs-whatever="@mdo" onclick="addBoardModal()">보드 추가하기</button>
+            <br/>
 
-        <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action">A simple default list group item</a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-primary">A simple primary list group item</a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-secondary">A simple secondary list group item</a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-success">A simple success list group item</a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-danger">A simple danger list group item</a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-warning">A simple warning list group item</a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-info">A simple info list group item</a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-light">A simple light list group item</a>
-            <a href="#" class="list-group-item list-group-item-action list-group-item-dark">A simple dark list group item</a>
-        </div>
+            <div id="board-container">
 
-        <ul class="list-group mt-4">
-            <a href="/api/boards/1" class="list-group-item list-group-item-action">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">Subheading</div>
-                        Content for list item
-                    </div>
-                    <span class="badge bg-primary rounded-pill">14</span>
-                </li>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">Subheading</div>
-                        Content for list item
-                    </div>
-                    <span class="badge bg-primary rounded-pill">2</span>
-                </li>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">Subheading</div>
-                        Content for list item
-                    </div>
-                    <span class="badge bg-primary rounded-pill">1</span>
-                </li>
-            </a>
+            </div>
+            <div class="spinner-border text-primary" role="status" id="spinner" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="paging-div">
+                <ul class="pagination" id="pagination"></ul>
+            </div>
         </ul>
+    </div>
+</div>
+
+<div class="modal fade" id="addBoardModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalLabel">보드 추가하기</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="boardName" class="col-form-label">보드 이름</label>
+                        <input type="text" class="form-control" id="boardName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="col-form-label">설명</label>
+                        <textarea class="form-control" id="content"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="addBoard()" id="addBtn">추가</button>
+                <button type="button" class="btn btn-success" onclick="updateBoard()" id="updateBtn" style="display: none;">수정</button>
+            </div>
+        </div>
     </div>
 </div>
 

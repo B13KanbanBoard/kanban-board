@@ -47,6 +47,12 @@ public class HomeController {
     @GetMapping("/api/boards/1")
     public String membersPage() { return "board"; }
 
+    //내 정보 페이지
+    @GetMapping("/api/members/myInfo")
+    public String myInfoPage() {
+        return "myInfo";
+    }
+
     /**
      * 폼 데이터 형식  현재 비활성
      */
