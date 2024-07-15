@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -29,23 +30,28 @@ public class HomeController {
     }
 
     //로그인 페이지
-    @GetMapping("/api/members/login-page")
+    @GetMapping("/members/login-page")
     public String loginPage() {
         return "login";
     }
 
     //회원가입 페이지
-    @GetMapping("/api/members/signup")
+    @GetMapping("/members/signup")
     public String signupPage() {
         return "signup";
     }
 
     // 선택한 보드 페이지 (카테코리 및 카드 나열)
-    @GetMapping("/api/boards/1")
-    public String membersPage() { return "board"; }
+    @GetMapping("/boards/{boardId}")
+    public ModelAndView test(@PathVariable Long boardId) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("boards"); // 실제 뷰 이름 (boards.html)
+        mav.addObject("boardId", boardId); // boardId를 모델에 추가
+        return mav;
+    }
 
     //내 정보 페이지
-    @GetMapping("/api/members/myInfo")
+    @GetMapping("/members/myInfo")
     public String myInfoPage() {
         return "myInfo";
     }
@@ -53,7 +59,7 @@ public class HomeController {
     /**
      * 폼 데이터 형식  현재 비활성
      */
-    @PostMapping("/api/members/signup2")
+    @PostMapping("/members/signup2")
     public String createMember2 (
             @Valid SignupRequest request, BindingResult bindingResult
     ) {
@@ -64,10 +70,10 @@ public class HomeController {
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
                 log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
             }
-            return "redirect:/api/members/signup";
+            return "redirect:/members/signup";
         }
         SignupResponse response = memberService.createUser(request);
-        return "redirect:/api/members/login-page";
+        return "redirect:/members/login-page";
     }
 
 
