@@ -1,0 +1,63 @@
+### 테스트에 사용할 데이터
+@email1 = email@email.com
+@password1 = 1234
+
+@email4 = test4@gmail.com
+@password4 = Abcdefg123!
+
+
+### 로그인
+GET http://localhost:8080/api/members/login
+Content-Type: application/json
+
+{
+  "email" : "{{email1}}",
+  "password" : "{{password1}}"
+}
+
+> {%
+    client.global.set("Authorization", response.headers.valueOf("Authorization"));
+    client.global.set("Authorization-refresh", response.headers.valueOf("Authorization-refresh"));
+%}
+
+
+### 카테고리 생성
+POST http://localhost:8080/api/boards/3/categories
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "name": "new category 240717"
+}
+
+
+### 카테고리 전체 조회
+GET http://localhost:8080/api/boards/3/categories
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+
+### 카테고리 수정
+PATCH http://localhost:8080/api/boards/3/categories/9
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "name": "updated category 240716"
+}
+
+
+### 카테고리 orderNumber 수정
+PATCH http://localhost:8080/api/boards/3/categories/8/update-order
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "orderNumber": 1
+}
+
+
+### 카테고리 삭제
+DELETE http://localhost:8080/api/boards/3/categories/10
+Authorization:{{Authorization}}
+Content-Type: application/json

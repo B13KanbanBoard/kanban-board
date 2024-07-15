@@ -1,0 +1,73 @@
+### 테스트에 사용할 데이터
+@email1 = email@email.com
+@password1 = 1234
+
+@email4 = test4@gmail.com
+@password4 = Abcdefg123!
+
+
+### 로그인
+GET http://localhost:8080/api/members/login
+Content-Type: application/json
+
+{
+  "email" : "{{email1}}",
+  "password" : "{{password1}}"
+}
+
+> {%
+    client.global.set("Authorization", response.headers.valueOf("Authorization"));
+    client.global.set("Authorization-refresh", response.headers.valueOf("Authorization-refresh"));
+%}
+
+
+### 카드 생성
+POST http://localhost:8080/api/categories/10/cards
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "new title 04"
+}
+
+
+### 카드 전체 조회
+GET http://localhost:8080/api/categories/11/cards
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+
+### 카드 선택 조회
+GET http://localhost:8080/api/categories/11/cards/2
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+
+### 카드 수정
+PATCH http://localhost:8080/api/categories/11/cards/1
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "title" : "updated card 1",
+  "assignee": "email@email.com",
+  "description": "this is about card 1",
+  "startDate": "2024-07-14",
+  "endDate": "2024-07-15"
+}
+
+
+### 카드 orderNuber 수정
+PATCH http://localhost:8080/api/categories/11/cards/1/update-order
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "orderNumber": 1
+}
+
+
+### 카드 삭제
+DELETE http://localhost:8080/api/categories/11/cards/3
+Authorization:{{Authorization}}
+Content-Type: application/json

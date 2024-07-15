@@ -1,9 +1,9 @@
 package com.sparta.kanbanboard.domain.category.repository;
 
-import com.sparta.kanbanboard.domain.category.entity.Category;
+import com.sparta.kanbanboard.domain.category.dto.CategoryResponse;
 
 import java.util.List;
 
 public interface CategoryRepositoryCustom {
-    List<Category> getCategoryListSortOrderNumber(long boardId);
+    List<CategoryResponse> getCategoryListSortOrderNumber(long boardId);
 }

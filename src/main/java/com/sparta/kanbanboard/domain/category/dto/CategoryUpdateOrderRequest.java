@@ -4,8 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class CategoryCreateRequest {
-
+public class CategoryUpdateOrderRequest {
     @NotBlank
-    private String name;
+    private Long orderNumber;
 }

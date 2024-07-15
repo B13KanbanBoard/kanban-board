@@ -66,4 +66,8 @@ public class MemberBoard {
             throw new BoardInappropriateException(INAPPROPRIATE_MEMBER_BOARD);
         }
     }
+
+    public boolean checkIfManager(){
+        return this.role.equals(BoardRole.MANAGER);
+    }
 }
