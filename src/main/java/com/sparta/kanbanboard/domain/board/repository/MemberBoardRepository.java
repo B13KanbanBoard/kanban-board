@@ -16,4 +16,6 @@ public interface MemberBoardRepository extends JpaRepository<MemberBoard, Long> 
 
     boolean existsByBoardIdAndMemberId(Long boardId, Long memberId);
 
+    List<MemberBoard> findAllByBoardId(Long boardId);
+
 }

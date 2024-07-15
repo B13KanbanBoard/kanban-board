@@ -1,9 +1,6 @@
 package com.sparta.kanbanboard.domain.card.service;
 
-import com.sparta.kanbanboard.common.exception.customexception.BoardNotFoundException;
-import com.sparta.kanbanboard.common.exception.customexception.CardNotFoundException;
-import com.sparta.kanbanboard.common.exception.customexception.CategoryNotFoundException;
-import com.sparta.kanbanboard.common.exception.customexception.MemberAccessDeniedException;
+import com.sparta.kanbanboard.common.exception.customexception.*;
 import com.sparta.kanbanboard.domain.board.entity.MemberBoard;
 import com.sparta.kanbanboard.domain.board.repository.MemberBoardRepository;
 import com.sparta.kanbanboard.domain.card.dto.*;
@@ -104,6 +101,17 @@ public class CardService {
         String description = req.getDescription();
         LocalDate startDate = req.getStartDate();
         LocalDate endDate = req.getEndDate();
+
+        if(assignee != null) {
+            List<MemberBoard> memberBoards = memberBoardRepository.findAllByBoardId(tempCard.getCategory().getBoard().getId());
+            for (MemberBoard memberBoard : memberBoards) {
+                if (assignee.equals(memberBoard.getMember().getEmail())) {
+                    tempCard.updateCard(title, assignee, description, startDate, endDate);
+                } else{
+                    throw new MemberNotFoundException(MEMBER_NOT_FOUND);
+                }
+            }
+        }
 
         tempCard.updateCard(title, assignee, description, startDate, endDate);
 
