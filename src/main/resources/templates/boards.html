@@ -11,6 +11,8 @@
     <!-- js-cookie -->
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 
+    <script src="/js/basic.js"></script>
+
     <title>선택 보드 페이지</title>
     <style>
         .header {
@@ -162,6 +164,9 @@
         <div id="header-title-select-shop">
             선택된 보드 상세
         </div>
+        <h1>Board ID: <span th:text="${boardId}"></span></h1>
+        <!-- 숨겨진 요소를 사용하여 boardId를 HTML로 전달 -->
+        <input type="hidden" id="boardId" th:value="${boardId}"/>
     </div>
     <div class = "mycards">
         <div class="row row-cols-1 row-cols-md-4 g-4">
@@ -234,6 +239,12 @@
 </body>
 
 <script>
+    $(document).ready(function () {
+        // 숨겨진 요소에서 boardId 값을 가져오기
+        var boardId = $('#boardId').val();
+        alert("현재 접속한 보드 ID : " + boardId);
+    });
+
     const openButtons = document.querySelectorAll('.open');
     const closeButton = document.querySelector('.close');
 

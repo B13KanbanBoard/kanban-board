@@ -53,7 +53,7 @@
         </div>
         <div class="d-grid gap-2">
             <button type="button" class="btn btn-primary" id="login-id-submit" onclick="onLogin()">로그인</button>
-            <button type="button" class="btn btn-secondary" id="login-id-btn" onclick="location.href='/api/members/signup'">회원가입</button>
+            <button type="button" class="btn btn-secondary" id="login-id-btn" onclick="location.href='/members/signup'">회원가입</button>
             <button type="button" class="btn btn-link" onclick="findPassword()">비밀번호 찾기</button>
         </div>
     </form>
@@ -120,7 +120,7 @@
             })
             .fail(function (jqXHR, textStatus) {
                 myModal.show();
-                window.location.href = host + '/api/members/login-page?error'
+                window.location.href = host + '/members/login-page?error'
             });
     }
 
