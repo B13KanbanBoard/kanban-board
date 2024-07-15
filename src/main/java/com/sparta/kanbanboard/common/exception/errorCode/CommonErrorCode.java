@@ -16,7 +16,8 @@ public enum CommonErrorCode implements ErrorCode {
     CATEGORY_NOT_FOUND(StatusCode.NOT_FOUND.getCode(), "요청된 카테고리를 찾을 수 없습니다."),
     CARD_NOT_FOUND(StatusCode.NOT_FOUND.getCode(), "요청된 카드를 찾을 수 없습니다."),
     BOARD_NOT_FOUND(StatusCode.NOT_FOUND.getCode(), "요청된 보드를 찾을 수 없습니다."),
-    DUPLICATED_ORDER_NUMBER(StatusCode.INTERNAL_SERVER_ERROR.getCode(), "중복된 순서입니다.")
+    DUPLICATED_ORDER_NUMBER(StatusCode.INTERNAL_SERVER_ERROR.getCode(), "중복된 순서입니다."),
+    DUPLICATED_CATEGORY_NAME(StatusCode.INTERNAL_SERVER_ERROR.getCode(), "중복된 카테고리명입니다.")
     ;
 
     private final Integer httpStatusCode;

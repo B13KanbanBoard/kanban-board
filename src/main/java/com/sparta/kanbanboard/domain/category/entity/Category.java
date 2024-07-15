@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.BAD_REQUEST;
-import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.DUPLICATED_ORDER_NUMBER;
+import static com.sparta.kanbanboard.common.exception.errorCode.CommonErrorCode.*;
 
 @Entity
 @Getter
@@ -88,7 +87,7 @@ public class Category extends Timestamped {
 
         for (Category category : categories) {
             if (Objects.equals(category.getName(), name)) {
-                throw new NameDuplicatedException(DUPLICATED_ORDER_NUMBER);
+                throw new NameDuplicatedException(DUPLICATED_CATEGORY_NAME);
             }
         }
     }

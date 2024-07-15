@@ -55,6 +55,8 @@ public class CategoryService {
 
         // 이름 중복 확인
         category.checkCategoryNameDuplicate(name);
+        // 순서 중복 확인
+        category.checkCategoryOrderNumberDuplicate(orderNum);
 
         categoryRepository.save(category);
 
