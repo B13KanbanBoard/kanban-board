@@ -12,8 +12,6 @@ import com.sparta.kanbanboard.domain.card.repository.CardRepository;
 import com.sparta.kanbanboard.domain.category.entity.Category;
 import com.sparta.kanbanboard.domain.category.repository.CategoryRepository;
 import com.sparta.kanbanboard.domain.member.entity.Member;
-import com.sparta.kanbanboard.domain.member.entity.MemberRole;
-import com.sparta.kanbanboard.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +42,9 @@ public class CardService {
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
 
         // 보드 참여자인지 확인
-        memberBoardRepository.existsByBoardIdAndMemberId(tempCategory.getBoard().getId(), member.getId());
+        if(!memberBoardRepository.existsByBoardIdAndMemberId(tempCategory.getBoard().getId(), member.getId())){
+            throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
+        }
 
         Long orderNum = (long) (tempCategory.getCardList().size() + 1);
 
@@ -63,7 +63,9 @@ public class CardService {
                 () -> new CategoryNotFoundException(CATEGORY_NOT_FOUND)
         );
         // 보드 참여자인지 확인
-        memberBoardRepository.existsByBoardIdAndMemberId(tempCategory.getBoard().getId(), member.getId());
+        if(!memberBoardRepository.existsByBoardIdAndMemberId(tempCategory.getBoard().getId(), member.getId())){
+            throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
+        }
 
         return cardRepository.getCardListSortOrderNumber(categoryId);
     }
@@ -75,7 +77,9 @@ public class CardService {
         Card tempCard = cardRepository.findById(cardId).orElseThrow(
                 () -> new CardNotFoundException(CARD_NOT_FOUND));
         // 보드 참여자인지 확인
-        memberBoardRepository.existsByBoardIdAndMemberId(tempCard.getCategory().getBoard().getId(), member.getId());
+        if(!memberBoardRepository.existsByBoardIdAndMemberId(tempCard.getCategory().getBoard().getId(), member.getId())){
+            throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
+        }
 
         tempCard.checkCategoryAndCardRelation(categoryId);
 

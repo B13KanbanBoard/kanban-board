@@ -43,7 +43,9 @@ public class CategoryService {
     @Transactional
     public CategoryResponse createCategory(Long boardId, String name, Member member) {
         // 보드 참여자인지 확인
-        memberBoardRepository.existsByBoardIdAndMemberId(boardId, member.getId());
+        if(!memberBoardRepository.existsByBoardIdAndMemberId(boardId, member.getId())){
+            throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
+        }
 
         Board tempBoard = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(BOARD_NOT_FOUND));
@@ -64,7 +66,9 @@ public class CategoryService {
      */
     public List<CategoryResponse> getAllCategories(Long boardId, Member member){
         // 보드 참여자인지 확인
-        memberBoardRepository.existsByBoardIdAndMemberId(boardId, member.getId());
+        if(!memberBoardRepository.existsByBoardIdAndMemberId(boardId, member.getId())){
+            throw new MemberAccessDeniedException(AUTH_USER_FORBIDDEN);
+        }
 
         return categoryRepository.getCategoryListSortOrderNumber(boardId)
                 .stream()
