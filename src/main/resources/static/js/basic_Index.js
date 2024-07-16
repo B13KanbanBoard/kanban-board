@@ -46,7 +46,7 @@ $(document).ready(function () {
 })
 
 function showBoard() {
-
+        var boardId = $('#boardId').val();
     $.ajax({
         type: "GET",
         url: "http://localhost:8080/api/boards?pageNum=1&size=5",
