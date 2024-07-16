@@ -48,6 +48,13 @@ public class CardService {
         // 카드 순서 중복 확인
         card.checkCardOrderNumberDuplicate(orderNum);
 
+        String assignee=null;
+        String description=null;
+        if(req.getAssignee() != null)
+            assignee = req.getAssignee();
+        if(req.getDescription() != null)
+            description = req.getDescription();
+        card.updateCard(null,assignee,description,null,null);
         cardRepository.save(card);
 
         return new CardCreateResponse(card.getId(), card.getTitle());

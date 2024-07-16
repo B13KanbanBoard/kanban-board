@@ -1,22 +1,22 @@
 package com.sparta.kanbanboard.front;
 
-import com.sparta.kanbanboard.common.base.dto.CommonResponse;
+import com.sparta.kanbanboard.domain.board.entity.Board;
+import com.sparta.kanbanboard.domain.board.repository.BoardRepository;
 import com.sparta.kanbanboard.domain.member.dto.SignupRequest;
 import com.sparta.kanbanboard.domain.member.dto.SignupResponse;
 import com.sparta.kanbanboard.domain.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
-
-import static com.sparta.kanbanboard.common.util.ControllerUtil.getResponseEntity;
 @Slf4j(topic = "HomeController")
 @Controller
 @RequiredArgsConstructor
@@ -41,12 +41,18 @@ public class HomeController {
         return "signup";
     }
 
+
     // 선택한 보드 페이지 (카테코리 및 카드 나열)
+    final private BoardRepository boardRepository;
     @GetMapping("/boards/{boardId}")
     public ModelAndView test(@PathVariable Long boardId) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("boards"); // 실제 뷰 이름 (boards.html)
         mav.addObject("boardId", boardId); // boardId를 모델에 추가
+
+        Board board = boardRepository.findById(boardId).orElseThrow(()->new IllegalArgumentException("Board not found"));
+        mav.addObject("boardName", board.getBoardName()); // 보드 이름 넘겨주기
+
         return mav;
     }
 
